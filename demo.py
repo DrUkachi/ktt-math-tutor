@@ -86,6 +86,7 @@ def ask_next(learner_id: str, age_band: str):
 
 
 def submit_answer(audio_path: str | None, tap_response: str,
+                  typed_response: float | int | None,
                   age_band: str, learner_id: str, pending_item_id: str):
     """Score the currently-displayed item. Then automatically ask the next
     one so the UX flows like a real tutor session."""
@@ -96,7 +97,9 @@ def submit_answer(audio_path: str | None, tap_response: str,
 
     item = tutor.curriculum.get(pending_item_id)
     spoken = _maybe_transcribe(audio_path)
-    response_text = spoken or tap_response or ""
+    typed = ("" if typed_response is None else str(int(typed_response)))
+    # Precedence: spoken > typed (older kids / large numbers) > tapped (young kids).
+    response_text = spoken or typed or tap_response or ""
     cycle = tutor.answer(item, response_text)
     lang = cycle.lang_detected if response_text else "kin"
     feedback_text = tutor.feedback(cycle.item, cycle.correct, lang)
@@ -147,9 +150,21 @@ def build_ui() -> gr.Blocks:
 
         with gr.Group():
             audio_in = gr.Audio(sources=["microphone"], type="filepath",
-                                label="Speak your answer (or tap below)")
-            tap = gr.Radio(choices=[str(i) for i in range(1, 11)],
-                           label="Or tap a number", value=None)
+                                label="Speak your answer")
+            # Youngest children: 0–20 big tap buttons cover 89% of the
+            # curriculum (71 of 80 items — any single-digit sum, any
+            # counting scene, any compare, most subtraction).
+            tap = gr.Radio(
+                choices=[str(i) for i in range(0, 21)],
+                label="Or tap a number (0–20)", value=None,
+            )
+            # Older children + large answers: a number input. Priority
+            # order in submit_answer is mic > typed > tapped, so the
+            # typed value wins when a tap + type are both set.
+            typed = gr.Number(
+                label="Or type a bigger number",
+                value=None, precision=0, minimum=0, maximum=999,
+            )
             submit_btn = gr.Button("Submit", variant="primary", size="lg")
 
         feedback_box = gr.Textbox(label="Feedback", interactive=False)
@@ -162,7 +177,7 @@ def build_ui() -> gr.Blocks:
         )
         submit_btn.click(
             submit_answer,
-            inputs=[audio_in, tap, age_band, learner, pending],
+            inputs=[audio_in, tap, typed, age_band, learner, pending],
             outputs=[prompt_box, prompt_audio, pending, feedback_box, diag_box],
         )
     return ui
