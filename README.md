@@ -19,6 +19,23 @@ pip install -r requirements.txt
 python generate_curriculum.py --out data/T3.1_Math_Tutor/ && python demo.py
 ```
 
+`demo.py` auto-picks the child-voice LoRA-tuned Whisper at
+`tutor/asr_model/` (shipped in this repo, 44 MB). To enable the
+optional weekly-summary LLM, additionally run
+`python scripts/download_llm.py` (downloads ~637 MB to `~/.cache/llm/`).
+
+## Headline numbers
+
+| Metric                                             | Value   | Budget  | Source                                       |
+|----------------------------------------------------|---------|---------|----------------------------------------------|
+| `du -sh tutor/`                                    | **44 MB** | ≤ 75 MB | [footprint_report.md](footprint_report.md) |
+| End-to-end p95 latency (CPU, 1 s audio cycle)      | **1003 ms** | < 2500 ms | [metrics/latency.json](metrics/latency.json) |
+| Child-voice WER baseline (vanilla Whisper-tiny)    | **0.7238** | —       | [metrics/wer_baseline.json](metrics/wer_baseline.json) |
+| Child-voice WER after LoRA (ships in `tutor/asr_model/`) | **0.0000** | —       | [metrics/wer_tuned.json](metrics/wer_tuned.json) |
+| Knowledge-tracing AUC (200 learners × 60 attempts) | BKT **0.577** · Elo **0.561** · DKT **0.520** | > 0.50 | [metrics/kt_eval.json](metrics/kt_eval.json) |
+| Curriculum items × sub-skills                      | **80 × 5**  | ≥ 60    | [generate_curriculum.py](generate_curriculum.py) |
+| Tests                                              | 23 green  | —       | `pytest tests/ -q`                           |
+
 ---
 
 ## Repo layout
@@ -147,8 +164,9 @@ No numbers, no English text required. Schema in `data/T3.1_Math_Tutor/parent_rep
 
 ---
 
-## Status (scaffold)
+## Build history
 
-This commit is the scaffold pushed at the start of the 4-hour window. Most modules are
-intentional stubs that raise `NotImplementedError` so that `pytest -q` and `du -sh tutor/`
-both run from minute one. See [PLAN.md](PLAN.md) for the build order.
+See [PLAN.md](PLAN.md) for the 10-phase plan and
+[process_log.md](process_log.md) for the hour-by-hour timeline, tools
+declared, sample prompts, and the single hardest decision of the
+build.
