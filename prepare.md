@@ -141,6 +141,22 @@ Scored under brief's **Model/Algorithm Performance (20%)** and
 > sequences under autograd, applies BCE-with-logits on next-response
 > prediction, and steps Adam. Completely separate code paths."
 
+### Q: "Why aren't any of your AUCs above 0.6?"
+> "Four reasons in order of effect. One: observation noise. My
+> generator has slip=0.1 and guess=0.2, so even a Bayes-optimal
+> predictor with perfect knowledge of latent mastery tops out around
+> AUC 0.65 to 0.70. BKT at 0.577 is already capturing about 75% of
+> the available signal. Two: DKT is undertrained — 160 learner
+> trajectories is maybe a tenth of what DKT papers use, so it falls
+> to 0.52 without the data to learn long-range dynamics. Three: BKT
+> uses default parameters rather than per-skill EM fits; EM would
+> add maybe 0.02 to 0.03. Four: in the second half of each test
+> learner's attempts, mastery has drifted up, so correctness variance
+> compresses and the AUC has less spread to work with. To push past
+> 0.6 I'd run 2,000 learners instead of 200, fit BKT via EM, or lower
+> slip and guess to 0.05 each — but that last change drifts away
+> from realistic numeracy noise levels."
+
 ### Q: "ε-DP — what's your sensitivity and why ε=1.0?"
 > "Sensitivity 1, because each learner contributes at most one count
 > to any aggregated bucket per item. ε=1.0 per learner per week is
