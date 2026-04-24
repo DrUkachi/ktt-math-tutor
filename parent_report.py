@@ -17,7 +17,81 @@ from collections import defaultdict
 from pathlib import Path
 
 from tutor.curriculum_loader import SKILLS
+from tutor.llm_head import LLMHead
 from tutor.storage import ProgressStore
+
+
+_DEFAULT_SUMMARY_FALLBACK = (
+    "This week your child practised math. They showed strength on {best}. "
+    "At home, try counting {best_words} together."
+)
+
+_BEST_WORDS = {
+    "counting": "objects like fruits or goats",
+    "number_sense": "numbers from 1 to 10",
+    "addition": "adding small numbers",
+    "subtraction": "taking things away",
+    "word_problem": "stories with numbers",
+}
+
+
+def build_summary_text(skills_block: dict, lang: str = "en") -> str:
+    """Return the narrative used for the QR-linked voiced summary.
+
+    Tries the optional :class:`LLMHead` first; falls back to a safe
+    deterministic template if the GGUF file is missing or generation
+    fails. Output is kept short so the TTS rendering stays under
+    ~30 seconds.
+    """
+    scores = {s: float(d["current"]) for s, d in skills_block.items()}
+    head = LLMHead()
+    out: str | None = None
+    if head.available():
+        try:
+            out = head.weekly_summary(scores, lang=lang)
+        except Exception:
+            out = None
+    if not out:
+        best = max(scores, key=lambda s: scores[s])
+        out = _DEFAULT_SUMMARY_FALLBACK.format(
+            best=best.replace("_", " "),
+            best_words=_BEST_WORDS.get(best, "numbers"),
+        )
+
+    # Keep at most the first 2 sentences: TinyLlama Q4 tends to drift
+    # into meta-commentary after a coherent opener.
+    sentences = [s.strip() for s in out.replace("\n", " ").split(".") if s.strip()]
+    out = ". ".join(sentences[:2]) + ("." if sentences else "")
+    return out.strip()
+
+
+def render_summary_wav(text: str, out_wav: Path, lang: str = "en") -> bool:
+    """Render ``text`` to a local WAV via Piper if a voice is available;
+    else write 1 s of silence as a placeholder. Returns True if real
+    audio was produced.
+    """
+    import subprocess
+    import wave
+
+    voice_dir = Path.home() / ".local" / "share" / "piper-voices"
+    pattern = {"en": "en_*.onnx", "fr": "fr_*.onnx", "kin": "kin_*.onnx"}.get(lang, "en_*.onnx")
+    voices = list(voice_dir.rglob(pattern)) if voice_dir.exists() else []
+
+    out_wav.parent.mkdir(parents=True, exist_ok=True)
+    if voices:
+        try:
+            subprocess.run(
+                ["python", "-m", "piper", "-m", str(voices[0]), "-f", str(out_wav)],
+                input=text.encode("utf-8"), check=True, capture_output=True, timeout=60,
+            )
+            return True
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            pass
+    # Silence fallback
+    with wave.open(str(out_wav), "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000)
+        w.writeframes(b"\x00\x00" * 16000)
+    return False
 
 
 def _aggregate(store: ProgressStore, learner_id: str, week_start: dt.date) -> dict:
@@ -110,6 +184,15 @@ def main() -> None:
     store = ProgressStore()
     report = _aggregate(store, args.learner_id, week_start)
 
+    # Generate the voiced-summary narrative and render it to a WAV that
+    # the QR code will point at.
+    summary_text = build_summary_text(report["skills"], lang="en")
+    report["voiced_summary_text"] = summary_text
+    out_wav = Path(f"reports/{args.learner_id}/{week_start}/summary.wav")
+    rendered = render_summary_wav(summary_text, out_wav, lang="en")
+    report["voiced_summary_audio"] = str(out_wav)
+    report["voiced_summary_rendered"] = rendered
+
     out_json = Path(args.out_json or
                     f"reports/{args.learner_id}/{week_start}/report.json")
     out_json.parent.mkdir(parents=True, exist_ok=True)
@@ -120,6 +203,8 @@ def main() -> None:
                    f"reports/{args.learner_id}/{week_start}/report.png")
     render_png(report, out_png)
     print(f"Wrote {out_json} and {out_png}")
+    print(f"Summary: {summary_text}")
+    print(f"Audio: {out_wav} (real TTS={rendered})")
 
 
 if __name__ == "__main__":
