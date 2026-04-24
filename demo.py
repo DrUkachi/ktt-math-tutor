@@ -161,7 +161,6 @@ def build_ui() -> gr.Blocks:
                 prompt_image = gr.Image(
                     label="Look at the picture",
                     interactive=False, height=260, show_label=True,
-                    show_download_button=False,
                 )
                 prompt_audio = gr.Audio(
                     label="Listen to the question",
