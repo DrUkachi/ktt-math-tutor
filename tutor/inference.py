@@ -99,10 +99,17 @@ class Tutor:
             "mix": "Not quite. Reka tugerageze nanone.",
         }[lang]
 
-    def step(self, age_band: str, response_text: str) -> Cycle:
-        """Run one full cycle. Returns the recorded :class:`Cycle`."""
+    def ask(self, age_band: str) -> Item:
+        """Pick and return the next item. Interactive UX uses this to
+        display the prompt BEFORE the child answers (see demo.py).
+        """
+        return self.next_item(age_band)
+
+    def answer(self, item: Item, response_text: str) -> Cycle:
+        """Score ``response_text`` against a previously-asked ``item``.
+        Records the attempt and updates the estimator.
+        """
         t0 = time.perf_counter()
-        item = self.next_item(age_band)
         lang = detect(response_text) if response_text else self.default_lang
         correct = self.score(item, response_text)
         response_ms = int((time.perf_counter() - t0) * 1000)
@@ -116,3 +123,8 @@ class Tutor:
             item=item, response=response_text, correct=correct,
             response_ms=response_ms, lang_detected=lang,
         )
+
+    def step(self, age_band: str, response_text: str) -> Cycle:
+        """Ask + answer in one call. Kept for batched replay / tests;
+        interactive UIs should use :meth:`ask` and :meth:`answer`."""
+        return self.answer(self.ask(age_band), response_text)
