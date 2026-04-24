@@ -47,11 +47,37 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", default="data/child_utt/manifest_eval.csv")
     parser.add_argument("--model-path", default=None,
-                        help="Path to CT2 model dir (post-LoRA). If omitted, uses vanilla whisper-tiny.")
+                        help="Path to CT2 model dir (post-LoRA).")
+    parser.add_argument("--vanilla", action="store_true",
+                        help="Force vanilla whisper-tiny from ~/.cache (for baseline reproduction).")
     parser.add_argument("--out-json", default=None)
     args = parser.parse_args()
 
-    asr = ChildASR(model_path=Path(args.model_path) if args.model_path else None)
+    # Resolve which model ChildASR should actually load.
+    from tutor.asr_adapt import _TUNED_MODEL
+    if args.vanilla:
+        # Bypass tutor/asr_model/ by pointing at a definitely-missing path;
+        # ChildASR then falls through to downloading vanilla whisper-tiny.
+        import os
+        os.environ["WHISPER_CACHE_DIR"] = os.path.expanduser("~/.cache/whisper-tiny-ct2")
+        # Trick the resolution by using a sentinel path that doesn't exist.
+        asr = ChildASR()
+        # Override: replace _TUNED_MODEL check by re-creating without it.
+        asr.model_path = None
+        # Monkey-patch: stop _load from auto-picking the tuned model.
+        import tutor.asr_adapt as _am
+        _am._TUNED_MODEL = Path("/nonexistent/force-vanilla")
+        label = "whisper-tiny (vanilla int8, ~/.cache)"
+    elif args.model_path:
+        asr = ChildASR(model_path=Path(args.model_path))
+        label = args.model_path
+    else:
+        asr = ChildASR()
+        if _TUNED_MODEL.exists() and (_TUNED_MODEL / "model.bin").exists():
+            label = f"{_TUNED_MODEL} (child-voice LoRA, int8 CT2)"
+        else:
+            label = "whisper-tiny (vanilla int8, ~/.cache)"
+    asr._load()
 
     refs: list[str] = []
     hyps: list[str] = []
@@ -83,7 +109,7 @@ def main() -> None:
     mean_latency = (t_total / len(rows) * 1000) if rows else 0.0
 
     summary = {
-        "model": args.model_path or "whisper-tiny (vanilla int8)",
+        "model": label,
         "n_clips": len(rows),
         "wer": round(wer_score, 4),
         "mean_transcribe_ms": round(mean_latency, 1),

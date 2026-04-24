@@ -3,24 +3,24 @@
   "budget_ms": 2500,
   "pass": true,
   "asr": {
-    "mean_ms": 860.5,
-    "median_ms": 829.4,
-    "p95_ms": 999.5,
-    "p99_ms": 1004.4,
-    "max_ms": 1004.4
+    "mean_ms": 1223.5,
+    "median_ms": 1166.5,
+    "p95_ms": 1595.8,
+    "p99_ms": 1687.3,
+    "max_ms": 1687.3
   },
   "tutor_step": {
-    "mean_ms": 3.3,
-    "median_ms": 2.8,
-    "p95_ms": 3.7,
-    "p99_ms": 11.8,
-    "max_ms": 11.8
+    "mean_ms": 3.5,
+    "median_ms": 3.1,
+    "p95_ms": 6.0,
+    "p99_ms": 6.3,
+    "max_ms": 6.3
   },
   "total": {
-    "mean_ms": 863.8,
-    "median_ms": 831.9,
-    "p95_ms": 1002.6,
-    "p99_ms": 1007.3,
-    "max_ms": 1007.3
+    "mean_ms": 1227.0,
+    "median_ms": 1169.6,
+    "p95_ms": 1599.3,
+    "p99_ms": 1692.3,
+    "max_ms": 1692.3
   }
 }

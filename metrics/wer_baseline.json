@@ -1,262 +1,262 @@
 {
   "summary": {
-    "model": "whisper-tiny (vanilla int8)",
+    "model": "whisper-tiny (vanilla int8, ~/.cache)",
     "n_clips": 36,
-    "wer": 0.7238,
-    "mean_transcribe_ms": 557.0
+    "wer": 0.7048,
+    "mean_transcribe_ms": 589.8
   },
   "per_clip": [
     {
       "utt_id": "U020_p030",
       "ref": "it is fifteen",
-      "hyp": "it is 15",
+      "hyp": "it is 13",
       "pitch": 3.0,
-      "t_ms": 4377.5
+      "t_ms": 492.7
     },
     {
       "utt_id": "U020_p045",
       "ref": "it is fifteen",
       "hyp": "this is a game",
       "pitch": 4.5,
-      "t_ms": 364.6
+      "t_ms": 520.1
     },
     {
       "utt_id": "U020_p060",
       "ref": "it is fifteen",
-      "hyp": "reception",
+      "hyp": "researching",
       "pitch": 6.0,
-      "t_ms": 333.9
+      "t_ms": 720.3
     },
     {
       "utt_id": "U023_p030",
       "ref": "twelve books",
       "hyp": "12 books",
       "pitch": 3.0,
-      "t_ms": 360.0
+      "t_ms": 484.3
     },
     {
       "utt_id": "U023_p045",
       "ref": "twelve books",
       "hyp": "12 books",
       "pitch": 4.5,
-      "t_ms": 428.9
+      "t_ms": 412.5
     },
     {
       "utt_id": "U023_p060",
       "ref": "twelve books",
-      "hyp": "12 books",
+      "hyp": "puzzles",
       "pitch": 6.0,
-      "t_ms": 882.9
+      "t_ms": 1083.1
     },
     {
       "utt_id": "U034_p030",
       "ref": "it is nine",
       "hyp": "it is not",
       "pitch": 3.0,
-      "t_ms": 428.2
+      "t_ms": 432.8
     },
     {
       "utt_id": "U034_p045",
       "ref": "it is nine",
-      "hyp": "is not",
+      "hyp": "it s not",
       "pitch": 4.5,
-      "t_ms": 421.7
+      "t_ms": 449.8
     },
     {
       "utt_id": "U034_p060",
       "ref": "it is nine",
-      "hyp": "is not",
+      "hyp": "it s mine",
       "pitch": 6.0,
-      "t_ms": 453.8
+      "t_ms": 553.0
     },
     {
       "utt_id": "U019_p030",
       "ref": "the answer is thirteen",
-      "hyp": "answers are pink",
+      "hyp": "answers 13",
       "pitch": 3.0,
-      "t_ms": 368.3
+      "t_ms": 1064.8
     },
     {
       "utt_id": "U019_p045",
       "ref": "the answer is thirteen",
-      "hyp": "guess it s 13",
+      "hyp": "cancer is 13",
       "pitch": 4.5,
-      "t_ms": 544.2
+      "t_ms": 1081.7
     },
     {
       "utt_id": "U019_p060",
       "ref": "the answer is thirteen",
       "hyp": "yes it s their team",
       "pitch": 6.0,
-      "t_ms": 353.4
+      "t_ms": 428.8
     },
     {
       "utt_id": "U033_p030",
       "ref": "there are eleven goats",
-      "hyp": "hey i really like the clothes",
+      "hyp": "hey we re like a ghost",
       "pitch": 3.0,
-      "t_ms": 376.6
+      "t_ms": 434.1
     },
     {
       "utt_id": "U033_p045",
       "ref": "there are eleven goats",
-      "hyp": "there are relinquents",
+      "hyp": "there are many goods",
       "pitch": 4.5,
-      "t_ms": 372.3
+      "t_ms": 453.2
     },
     {
       "utt_id": "U033_p060",
       "ref": "there are eleven goats",
       "hyp": "there are hundreds",
       "pitch": 6.0,
-      "t_ms": 353.8
+      "t_ms": 517.7
     },
     {
       "utt_id": "U047_p030",
       "ref": "i see four mangoes",
       "hyp": "i see four angles",
       "pitch": 3.0,
-      "t_ms": 349.0
+      "t_ms": 457.8
     },
     {
       "utt_id": "U047_p045",
       "ref": "i see four mangoes",
       "hyp": "i see four angles",
       "pitch": 4.5,
-      "t_ms": 378.2
+      "t_ms": 428.6
     },
     {
       "utt_id": "U047_p060",
       "ref": "i see four mangoes",
       "hyp": "i see four angles",
       "pitch": 6.0,
-      "t_ms": 342.8
+      "t_ms": 427.7
     },
     {
       "utt_id": "U014_p030",
       "ref": "four mangoes",
-      "hyp": "4 mayors",
+      "hyp": "four mayors",
       "pitch": 3.0,
-      "t_ms": 919.9
+      "t_ms": 517.5
     },
     {
       "utt_id": "U014_p045",
       "ref": "four mangoes",
-      "hyp": "for others",
+      "hyp": "for enders",
       "pitch": 4.5,
-      "t_ms": 803.4
+      "t_ms": 1205.1
     },
     {
       "utt_id": "U014_p060",
       "ref": "four mangoes",
       "hyp": "for hangers",
       "pitch": 6.0,
-      "t_ms": 688.5
+      "t_ms": 999.8
     },
     {
       "utt_id": "U013_p030",
       "ref": "fifteen",
-      "hyp": "thank you",
+      "hyp": "please",
       "pitch": 3.0,
-      "t_ms": 711.8
+      "t_ms": 979.3
     },
     {
       "utt_id": "U013_p045",
       "ref": "fifteen",
       "hyp": "good thing",
       "pitch": 4.5,
-      "t_ms": 298.4
+      "t_ms": 421.0
     },
     {
       "utt_id": "U013_p060",
       "ref": "fifteen",
       "hyp": "kissing",
       "pitch": 6.0,
-      "t_ms": 300.8
+      "t_ms": 419.7
     },
     {
       "utt_id": "U004_p030",
       "ref": "there are eleven mangoes",
       "hyp": "there were 11 angles",
       "pitch": 3.0,
-      "t_ms": 336.3
+      "t_ms": 425.5
     },
     {
       "utt_id": "U004_p045",
       "ref": "there are eleven mangoes",
       "hyp": "there were eleven eggs",
       "pitch": 4.5,
-      "t_ms": 310.9
+      "t_ms": 415.5
     },
     {
       "utt_id": "U004_p060",
       "ref": "there are eleven mangoes",
-      "hyp": "there are really many things",
+      "hyp": "there are real negatives",
       "pitch": 6.0,
-      "t_ms": 465.4
+      "t_ms": 420.2
     },
     {
       "utt_id": "U031_p030",
       "ref": "eight",
       "hyp": "thanks",
       "pitch": 3.0,
-      "t_ms": 311.7
+      "t_ms": 431.8
     },
     {
       "utt_id": "U031_p045",
       "ref": "eight",
       "hyp": "thanks",
       "pitch": 4.5,
-      "t_ms": 368.4
+      "t_ms": 408.5
     },
     {
       "utt_id": "U031_p060",
       "ref": "eight",
       "hyp": "thanks",
       "pitch": 6.0,
-      "t_ms": 684.0
+      "t_ms": 994.4
     },
     {
       "utt_id": "U024_p030",
       "ref": "it is two",
       "hyp": "you too",
       "pitch": 3.0,
-      "t_ms": 391.1
+      "t_ms": 417.5
     },
     {
       "utt_id": "U024_p045",
       "ref": "it is two",
       "hyp": "it s true",
       "pitch": 4.5,
-      "t_ms": 758.4
+      "t_ms": 1026.8
     },
     {
       "utt_id": "U024_p060",
       "ref": "it is two",
       "hyp": "yes sir",
       "pitch": 6.0,
-      "t_ms": 314.0
+      "t_ms": 426.0
     },
     {
       "utt_id": "U007_p030",
       "ref": "there are seven beads",
-      "hyp": "there are seven bees",
+      "hyp": "there are 70 s",
       "pitch": 3.0,
-      "t_ms": 303.5
+      "t_ms": 427.5
     },
     {
       "utt_id": "U007_p045",
       "ref": "there are seven beads",
       "hyp": "there are 70 s",
       "pitch": 4.5,
-      "t_ms": 311.5
+      "t_ms": 429.3
     },
     {
       "utt_id": "U007_p060",
       "ref": "there are seven beads",
       "hyp": "there are 70 s",
       "pitch": 6.0,
-      "t_ms": 283.8
+      "t_ms": 422.9
     }
   ]
 }

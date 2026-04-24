@@ -1,9 +1,9 @@
 {
   "summary": {
-    "model": "tutor/asr_model",
+    "model": "/teamspace/studios/this_studio/ktt-math-tutor/tutor/asr_model (child-voice LoRA, int8 CT2)",
     "n_clips": 36,
     "wer": 0.0,
-    "mean_transcribe_ms": 463.7
+    "mean_transcribe_ms": 465.1
   },
   "per_clip": [
     {
@@ -11,252 +11,252 @@
       "ref": "it is fifteen",
       "hyp": "it is fifteen",
       "pitch": 3.0,
-      "t_ms": 3985.6
+      "t_ms": 475.3
     },
     {
       "utt_id": "U020_p045",
       "ref": "it is fifteen",
       "hyp": "it is fifteen",
       "pitch": 4.5,
-      "t_ms": 355.5
+      "t_ms": 504.6
     },
     {
       "utt_id": "U020_p060",
       "ref": "it is fifteen",
       "hyp": "it is fifteen",
       "pitch": 6.0,
-      "t_ms": 372.5
+      "t_ms": 544.3
     },
     {
       "utt_id": "U023_p030",
       "ref": "twelve books",
       "hyp": "twelve books",
       "pitch": 3.0,
-      "t_ms": 352.5
+      "t_ms": 579.9
     },
     {
       "utt_id": "U023_p045",
       "ref": "twelve books",
       "hyp": "twelve books",
       "pitch": 4.5,
-      "t_ms": 344.9
+      "t_ms": 566.3
     },
     {
       "utt_id": "U023_p060",
       "ref": "twelve books",
       "hyp": "twelve books",
       "pitch": 6.0,
-      "t_ms": 416.4
+      "t_ms": 438.5
     },
     {
       "utt_id": "U034_p030",
       "ref": "it is nine",
       "hyp": "it is nine",
       "pitch": 3.0,
-      "t_ms": 412.1
+      "t_ms": 436.6
     },
     {
       "utt_id": "U034_p045",
       "ref": "it is nine",
       "hyp": "it is nine",
       "pitch": 4.5,
-      "t_ms": 342.3
+      "t_ms": 447.4
     },
     {
       "utt_id": "U034_p060",
       "ref": "it is nine",
       "hyp": "it is nine",
       "pitch": 6.0,
-      "t_ms": 335.1
+      "t_ms": 481.2
     },
     {
       "utt_id": "U019_p030",
       "ref": "the answer is thirteen",
       "hyp": "the answer is thirteen",
       "pitch": 3.0,
-      "t_ms": 351.4
+      "t_ms": 498.6
     },
     {
       "utt_id": "U019_p045",
       "ref": "the answer is thirteen",
       "hyp": "the answer is thirteen",
       "pitch": 4.5,
-      "t_ms": 345.5
+      "t_ms": 446.8
     },
     {
       "utt_id": "U019_p060",
       "ref": "the answer is thirteen",
       "hyp": "the answer is thirteen",
       "pitch": 6.0,
-      "t_ms": 373.1
+      "t_ms": 431.7
     },
     {
       "utt_id": "U033_p030",
       "ref": "there are eleven goats",
       "hyp": "there are eleven goats",
       "pitch": 3.0,
-      "t_ms": 346.7
+      "t_ms": 440.1
     },
     {
       "utt_id": "U033_p045",
       "ref": "there are eleven goats",
       "hyp": "there are eleven goats",
       "pitch": 4.5,
-      "t_ms": 349.0
+      "t_ms": 426.0
     },
     {
       "utt_id": "U033_p060",
       "ref": "there are eleven goats",
       "hyp": "there are eleven goats",
       "pitch": 6.0,
-      "t_ms": 338.2
+      "t_ms": 423.6
     },
     {
       "utt_id": "U047_p030",
       "ref": "i see four mangoes",
       "hyp": "i see four mangoes",
       "pitch": 3.0,
-      "t_ms": 349.8
+      "t_ms": 444.0
     },
     {
       "utt_id": "U047_p045",
       "ref": "i see four mangoes",
       "hyp": "i see four mangoes",
       "pitch": 4.5,
-      "t_ms": 368.2
+      "t_ms": 458.3
     },
     {
       "utt_id": "U047_p060",
       "ref": "i see four mangoes",
       "hyp": "i see four mangoes",
       "pitch": 6.0,
-      "t_ms": 378.8
+      "t_ms": 452.2
     },
     {
       "utt_id": "U014_p030",
       "ref": "four mangoes",
       "hyp": "four mangoes",
       "pitch": 3.0,
-      "t_ms": 374.3
+      "t_ms": 437.7
     },
     {
       "utt_id": "U014_p045",
       "ref": "four mangoes",
       "hyp": "four mangoes",
       "pitch": 4.5,
-      "t_ms": 351.8
+      "t_ms": 453.7
     },
     {
       "utt_id": "U014_p060",
       "ref": "four mangoes",
       "hyp": "four mangoes",
       "pitch": 6.0,
-      "t_ms": 350.3
+      "t_ms": 439.0
     },
     {
       "utt_id": "U013_p030",
       "ref": "fifteen",
       "hyp": "fifteen",
       "pitch": 3.0,
-      "t_ms": 348.0
+      "t_ms": 438.9
     },
     {
       "utt_id": "U013_p045",
       "ref": "fifteen",
       "hyp": "fifteen",
       "pitch": 4.5,
-      "t_ms": 390.7
+      "t_ms": 442.4
     },
     {
       "utt_id": "U013_p060",
       "ref": "fifteen",
       "hyp": "fifteen",
       "pitch": 6.0,
-      "t_ms": 444.6
+      "t_ms": 435.6
     },
     {
       "utt_id": "U004_p030",
       "ref": "there are eleven mangoes",
       "hyp": "there are eleven mangoes",
       "pitch": 3.0,
-      "t_ms": 399.6
+      "t_ms": 436.8
     },
     {
       "utt_id": "U004_p045",
       "ref": "there are eleven mangoes",
       "hyp": "there are eleven mangoes",
       "pitch": 4.5,
-      "t_ms": 387.6
+      "t_ms": 449.2
     },
     {
       "utt_id": "U004_p060",
       "ref": "there are eleven mangoes",
       "hyp": "there are eleven mangoes",
       "pitch": 6.0,
-      "t_ms": 364.8
+      "t_ms": 446.0
     },
     {
       "utt_id": "U031_p030",
       "ref": "eight",
       "hyp": "eight",
       "pitch": 3.0,
-      "t_ms": 335.0
+      "t_ms": 424.0
     },
     {
       "utt_id": "U031_p045",
       "ref": "eight",
       "hyp": "eight",
       "pitch": 4.5,
-      "t_ms": 332.4
+      "t_ms": 454.4
     },
     {
       "utt_id": "U031_p060",
       "ref": "eight",
       "hyp": "eight",
       "pitch": 6.0,
-      "t_ms": 341.6
+      "t_ms": 439.2
     },
     {
       "utt_id": "U024_p030",
       "ref": "it is two",
       "hyp": "it is two",
       "pitch": 3.0,
-      "t_ms": 380.9
+      "t_ms": 454.6
     },
     {
       "utt_id": "U024_p045",
       "ref": "it is two",
       "hyp": "it is two",
       "pitch": 4.5,
-      "t_ms": 361.4
+      "t_ms": 448.8
     },
     {
       "utt_id": "U024_p060",
       "ref": "it is two",
       "hyp": "it is two",
       "pitch": 6.0,
-      "t_ms": 338.8
+      "t_ms": 443.2
     },
     {
       "utt_id": "U007_p030",
       "ref": "there are seven beads",
       "hyp": "there are seven beads",
       "pitch": 3.0,
-      "t_ms": 338.4
+      "t_ms": 443.3
     },
     {
       "utt_id": "U007_p045",
       "ref": "there are seven beads",
       "hyp": "there are seven beads",
       "pitch": 4.5,
-      "t_ms": 377.9
+      "t_ms": 574.5
     },
     {
       "utt_id": "U007_p060",
       "ref": "there are seven beads",
       "hyp": "there are seven beads",
       "pitch": 6.0,
-      "t_ms": 358.6
+      "t_ms": 587.0
     }
   ]
 }
