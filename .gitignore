@@ -34,6 +34,10 @@ data/child_utt/eval/
 data/child_utt/_adult_raw/
 outputs/
 
+# Noise corpora (regeneratable via scripts/download_esc50.py / download_musan.py)
+data/esc50/
+data/musan/
+
 # Build / OS
 .DS_Store
 Thumbs.db

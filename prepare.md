@@ -125,15 +125,17 @@ Scored under brief's **Model/Algorithm Performance (20%)** and
 > a scalar rating per learner — useful when the team can't afford
 > to fit or retrain anything."
 
-### Q: "WER 0.00 — too good to be true?"
-> "It's in-distribution: same Piper voice, same pitch-shift range as
-> training, unseen phrasings only. That validates the pipeline end
-> to end — LoRA r=16 on q_proj/v_proj, 4 epochs on L4, merge,
-> CTranslate2 int8 for CPU inference. On real child voices I would
-> expect WER 0.30–0.45; the single best augmentation to add is real
-> room-impulse-response convolution plus MUSAN classroom noise at
-> about 12 dB SNR. That's already stubbed in
-> `augment_for_training`."
+### Q: "WER 0.0190 — too good to be true?"
+> "It's in-distribution: same Piper voice, same pitch-shift range,
+> same noise distribution (ESC-50 at 12 dB SNR) as training, unseen
+> phrasings only. The number validates the pipeline under realistic
+> noise — vanilla Whisper on the same noisy eval scores 0.82, so
+> the LoRA is recovering 97% of the noise-induced WER. On real child
+> voices I'd still expect WER in the 0.25–0.40 range because Piper
+> prosody isn't children's prosody, but the noise-robustness
+> property should transfer. Single biggest open improvement: real
+> child speech from Common Voice's child age band, which the brief
+> lists but I substituted with Piper for reproducibility."
 
 ### Q: "Your DKT `update()` uses `torch.no_grad()`. How does `fit()` train it?"
 > "`update()` is the inference-time rollout — hidden state flows
@@ -399,8 +401,8 @@ jupyter nbconvert --to notebook --execute notebooks/kt_eval.ipynb --output /tmp/
 | p95 latency CPU | ~1.6 s |
 | Budget | < 2.5 s |
 | Curriculum items × skills | 80 × 5 |
-| Baseline child-voice WER | 0.7048 |
-| Tuned child-voice WER | 0.0000 |
+| Baseline WER (vanilla Whisper + pitch + ESC-50 noise) | 0.8190 |
+| Tuned WER (LoRA + pitch + ESC-50 noise @ 12 dB SNR) | 0.0190 |
 | BKT / Elo / DKT AUC | 0.577 / 0.561 / 0.520 |
 | Synthetic replay | 200 learners × 60 attempts |
 | QLoRA TinyLlama Q4_K_M | 637 MB (in `~/.cache/`) |

@@ -36,7 +36,12 @@ from tutor.asr_adapt import augment_for_training
 
 
 PIPER_VOICE = Path.home() / ".local" / "share" / "piper-voices" / "en_US-lessac-medium.onnx"
-MUSAN_NOISE_DIR = Path(__file__).resolve().parent.parent / "data" / "musan" / "noise"
+# Classroom-noise overlay source. We prefer MUSAN (brief-specified)
+# when available, fall through to ESC-50 (HF-hosted; reliable CDN)
+# otherwise. Either populates the same noise pool in the builder.
+_REPO_DATA = Path(__file__).resolve().parent.parent / "data"
+MUSAN_NOISE_DIR = _REPO_DATA / "musan" / "noise"
+ESC50_NOISE_DIR = _REPO_DATA / "esc50" / "audio"
 
 NUMBERS_EN = ["one", "two", "three", "four", "five",
               "six", "seven", "eight", "nine", "ten",
@@ -57,16 +62,22 @@ PITCH_STEPS = (3.0, 4.5, 6.0)
 NOISE_SNR_DB = 12.0  # Brief-specified SNR for the classroom-noise overlay.
 
 
-def _list_musan_noise_clips() -> list[Path]:
-    """Return the list of MUSAN .wav clips available for overlay.
+def _list_noise_clips() -> tuple[str, list[Path]]:
+    """Return (source_name, wav_paths) for classroom-noise overlay.
 
-    Returns an empty list if the MUSAN subset hasn't been downloaded
-    yet — caller then builds a noise-free corpus, which is strictly
-    worse but keeps the pipeline runnable.
+    Prefers MUSAN when ``data/musan/noise/`` has clips; otherwise falls
+    back to ESC-50. Returns an empty list if neither is present — the
+    caller then builds a noise-free corpus.
     """
-    if not MUSAN_NOISE_DIR.exists():
-        return []
-    return sorted(MUSAN_NOISE_DIR.rglob("*.wav"))
+    if MUSAN_NOISE_DIR.exists():
+        musan_clips = sorted(MUSAN_NOISE_DIR.rglob("*.wav"))
+        if musan_clips:
+            return "musan", musan_clips
+    if ESC50_NOISE_DIR.exists():
+        esc_clips = sorted(ESC50_NOISE_DIR.glob("*.wav"))
+        if esc_clips:
+            return "esc50", esc_clips
+    return "none", []
 
 
 def _pick_noise_clip(
@@ -142,12 +153,14 @@ def main() -> None:
 
     rows_by_split: dict[str, list[dict]] = {"train": [], "eval": []}
 
-    noise_pool = _list_musan_noise_clips()
+    noise_source, noise_pool = _list_noise_clips()
     if noise_pool:
-        print(f"MUSAN noise pool: {len(noise_pool)} clips at {NOISE_SNR_DB} dB SNR")
+        print(f"Noise overlay: {noise_source} · {len(noise_pool)} clips · "
+              f"{NOISE_SNR_DB} dB SNR")
     else:
-        print(f"WARNING: {MUSAN_NOISE_DIR} empty — corpus will be clean (no noise overlay).")
-        print("         Run: python scripts/download_musan.py")
+        print("WARNING: no noise corpus found — corpus will be clean.")
+        print("         Run one of:  python scripts/download_musan.py")
+        print("                      python scripts/download_esc50.py")
 
     for split_name, utt_list in split.items():
         split_dir = out_dir / split_name
@@ -175,7 +188,7 @@ def main() -> None:
                     "transcript_en": text,
                     "language": "en",
                     "pitch_semitones": semis,
-                    "noise_overlay": "musan" if noise is not None else "none",
+                    "noise_overlay": noise_source if noise is not None else "none",
                     "snr_db": NOISE_SNR_DB if noise is not None else None,
                     "split": split_name,
                 })

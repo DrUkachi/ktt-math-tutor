@@ -1,0 +1,262 @@
+{
+  "summary": {
+    "model": "/teamspace/studios/this_studio/ktt-math-tutor/tutor/asr_model (child-voice LoRA, int8 CT2)",
+    "n_clips": 36,
+    "wer": 0.019,
+    "mean_transcribe_ms": 371.4
+  },
+  "per_clip": [
+    {
+      "utt_id": "U020_p030",
+      "ref": "it is fifteen",
+      "hyp": "it is fifteen",
+      "pitch": 3.0,
+      "t_ms": 405.9
+    },
+    {
+      "utt_id": "U020_p045",
+      "ref": "it is fifteen",
+      "hyp": "it is fifteen",
+      "pitch": 4.5,
+      "t_ms": 372.4
+    },
+    {
+      "utt_id": "U020_p060",
+      "ref": "it is fifteen",
+      "hyp": "it is fifteen",
+      "pitch": 6.0,
+      "t_ms": 343.2
+    },
+    {
+      "utt_id": "U023_p030",
+      "ref": "twelve books",
+      "hyp": "twelve books",
+      "pitch": 3.0,
+      "t_ms": 366.8
+    },
+    {
+      "utt_id": "U023_p045",
+      "ref": "twelve books",
+      "hyp": "twelve books",
+      "pitch": 4.5,
+      "t_ms": 361.4
+    },
+    {
+      "utt_id": "U023_p060",
+      "ref": "twelve books",
+      "hyp": "twelve books",
+      "pitch": 6.0,
+      "t_ms": 455.2
+    },
+    {
+      "utt_id": "U034_p030",
+      "ref": "it is nine",
+      "hyp": "it is nine",
+      "pitch": 3.0,
+      "t_ms": 428.5
+    },
+    {
+      "utt_id": "U034_p045",
+      "ref": "it is nine",
+      "hyp": "it is one",
+      "pitch": 4.5,
+      "t_ms": 430.1
+    },
+    {
+      "utt_id": "U034_p060",
+      "ref": "it is nine",
+      "hyp": "it is nine",
+      "pitch": 6.0,
+      "t_ms": 433.6
+    },
+    {
+      "utt_id": "U019_p030",
+      "ref": "the answer is thirteen",
+      "hyp": "the answer is thirteen",
+      "pitch": 3.0,
+      "t_ms": 406.6
+    },
+    {
+      "utt_id": "U019_p045",
+      "ref": "the answer is thirteen",
+      "hyp": "the answer is thirteen",
+      "pitch": 4.5,
+      "t_ms": 355.5
+    },
+    {
+      "utt_id": "U019_p060",
+      "ref": "the answer is thirteen",
+      "hyp": "the answer is thirteen",
+      "pitch": 6.0,
+      "t_ms": 371.8
+    },
+    {
+      "utt_id": "U033_p030",
+      "ref": "there are eleven goats",
+      "hyp": "there are eleven goats",
+      "pitch": 3.0,
+      "t_ms": 345.0
+    },
+    {
+      "utt_id": "U033_p045",
+      "ref": "there are eleven goats",
+      "hyp": "there are eleven goats",
+      "pitch": 4.5,
+      "t_ms": 351.9
+    },
+    {
+      "utt_id": "U033_p060",
+      "ref": "there are eleven goats",
+      "hyp": "there are eleven goats",
+      "pitch": 6.0,
+      "t_ms": 403.5
+    },
+    {
+      "utt_id": "U047_p030",
+      "ref": "i see four mangoes",
+      "hyp": "i see four mangoes",
+      "pitch": 3.0,
+      "t_ms": 354.0
+    },
+    {
+      "utt_id": "U047_p045",
+      "ref": "i see four mangoes",
+      "hyp": "i see four mangoes",
+      "pitch": 4.5,
+      "t_ms": 388.1
+    },
+    {
+      "utt_id": "U047_p060",
+      "ref": "i see four mangoes",
+      "hyp": "i see the four mangoes",
+      "pitch": 6.0,
+      "t_ms": 370.0
+    },
+    {
+      "utt_id": "U014_p030",
+      "ref": "four mangoes",
+      "hyp": "four mangoes",
+      "pitch": 3.0,
+      "t_ms": 368.3
+    },
+    {
+      "utt_id": "U014_p045",
+      "ref": "four mangoes",
+      "hyp": "four mangoes",
+      "pitch": 4.5,
+      "t_ms": 362.9
+    },
+    {
+      "utt_id": "U014_p060",
+      "ref": "four mangoes",
+      "hyp": "four mangoes",
+      "pitch": 6.0,
+      "t_ms": 377.8
+    },
+    {
+      "utt_id": "U013_p030",
+      "ref": "fifteen",
+      "hyp": "fifteen",
+      "pitch": 3.0,
+      "t_ms": 359.9
+    },
+    {
+      "utt_id": "U013_p045",
+      "ref": "fifteen",
+      "hyp": "fifteen",
+      "pitch": 4.5,
+      "t_ms": 419.2
+    },
+    {
+      "utt_id": "U013_p060",
+      "ref": "fifteen",
+      "hyp": "fifteen",
+      "pitch": 6.0,
+      "t_ms": 403.6
+    },
+    {
+      "utt_id": "U004_p030",
+      "ref": "there are eleven mangoes",
+      "hyp": "there are eleven mangoes",
+      "pitch": 3.0,
+      "t_ms": 344.4
+    },
+    {
+      "utt_id": "U004_p045",
+      "ref": "there are eleven mangoes",
+      "hyp": "there are eleven mangoes",
+      "pitch": 4.5,
+      "t_ms": 349.8
+    },
+    {
+      "utt_id": "U004_p060",
+      "ref": "there are eleven mangoes",
+      "hyp": "there are eleven mangoes",
+      "pitch": 6.0,
+      "t_ms": 349.0
+    },
+    {
+      "utt_id": "U031_p030",
+      "ref": "eight",
+      "hyp": "eight",
+      "pitch": 3.0,
+      "t_ms": 349.8
+    },
+    {
+      "utt_id": "U031_p045",
+      "ref": "eight",
+      "hyp": "eight",
+      "pitch": 4.5,
+      "t_ms": 324.8
+    },
+    {
+      "utt_id": "U031_p060",
+      "ref": "eight",
+      "hyp": "eight",
+      "pitch": 6.0,
+      "t_ms": 329.4
+    },
+    {
+      "utt_id": "U024_p030",
+      "ref": "it is two",
+      "hyp": "it is two",
+      "pitch": 3.0,
+      "t_ms": 342.4
+    },
+    {
+      "utt_id": "U024_p045",
+      "ref": "it is two",
+      "hyp": "it is two",
+      "pitch": 4.5,
+      "t_ms": 325.4
+    },
+    {
+      "utt_id": "U024_p060",
+      "ref": "it is two",
+      "hyp": "it is two",
+      "pitch": 6.0,
+      "t_ms": 339.2
+    },
+    {
+      "utt_id": "U007_p030",
+      "ref": "there are seven beads",
+      "hyp": "there are seven beads",
+      "pitch": 3.0,
+      "t_ms": 345.4
+    },
+    {
+      "utt_id": "U007_p045",
+      "ref": "there are seven beads",
+      "hyp": "there are seven beads",
+      "pitch": 4.5,
+      "t_ms": 358.3
+    },
+    {
+      "utt_id": "U007_p060",
+      "ref": "there are seven beads",
+      "hyp": "there are seven beads",
+      "pitch": 6.0,
+      "t_ms": 377.9
+    }
+  ]
+}

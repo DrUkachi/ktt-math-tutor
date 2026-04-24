@@ -154,6 +154,10 @@ def main() -> None:
     merged_out.mkdir(parents=True, exist_ok=True)
     merged.save_pretrained(merged_out)
     processor.save_pretrained(merged_out)
+    # transformers>=5 writes a unified ``processor_config.json`` but
+    # CTranslate2 still looks for the old-style ``preprocessor_config.json``.
+    # Saving the feature extractor directly emits that file.
+    feat_extractor.save_pretrained(merged_out)
     print(f"Merged HF model saved to {merged_out}")
 
     # --- Convert to CTranslate2 int8 for CPU inference ---

@@ -159,8 +159,8 @@ to CPU and re-run step 5 to confirm CPU inference still works.
 |----------------------------------------------------|---------|---------|----------------------------------------------|
 | `du -sh tutor/`                                    | **44 MB** | ≤ 75 MB | [footprint_report.md](footprint_report.md) |
 | End-to-end p95 latency (CPU, 1 s audio cycle)      | **1003 ms** | < 2500 ms | [metrics/latency.json](metrics/latency.json) |
-| Child-voice WER baseline (vanilla Whisper-tiny)    | **0.7238** | —       | [metrics/wer_baseline.json](metrics/wer_baseline.json) |
-| Child-voice WER after LoRA (ships in `tutor/asr_model/`) | **0.0000** | —       | [metrics/wer_tuned.json](metrics/wer_tuned.json) |
+| Child-voice WER — vanilla Whisper-tiny, **noise-augmented** (pitch + ESC-50 @ 12 dB SNR) | **0.8190** | —       | [metrics/wer_baseline_noisy.json](metrics/wer_baseline_noisy.json) |
+| Child-voice WER — LoRA-tuned on noisy corpus (ships in `tutor/asr_model/`) | **0.0190** | —       | [metrics/wer_tuned_noisy.json](metrics/wer_tuned_noisy.json) |
 | Knowledge-tracing AUC (200 learners × 60 attempts) | BKT **0.577** · Elo **0.561** · DKT **0.520** | > 0.50 | [metrics/kt_eval.json](metrics/kt_eval.json) |
 | Curriculum items × sub-skills                      | **80 × 5**  | ≥ 60    | [generate_curriculum.py](generate_curriculum.py) |
 | Tests                                              | 27 green  | —       | `pytest tests/ -q`                           |
