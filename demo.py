@@ -106,9 +106,14 @@ def ask_next(learner_id: str, age_band: str):
 
 
 def submit_answer(audio_path: str | None, tap_response: str,
+                  typed_response: str,
                   age_band: str, learner_id: str, pending_item_id: str):
     """Score the currently-displayed item. Then automatically ask the next
-    one so the UX flows like a real tutor session."""
+    one so the UX flows like a real tutor session.
+
+    Three-way OR on the inputs: whichever channel the child actually
+    used wins. Order (first non-empty wins): spoken > typed > tapped.
+    """
     tutor = _load_tutor(learner_id)
     if not pending_item_id:
         # No active question yet — treat Submit as "please start a session."
@@ -116,9 +121,10 @@ def submit_answer(audio_path: str | None, tap_response: str,
 
     item = tutor.curriculum.get(pending_item_id)
     spoken = _maybe_transcribe(audio_path)
-    # Precedence: spoken > tapped. If the mic returned a transcript,
-    # use it; otherwise the tap value (or empty string if nothing).
-    response_text = spoken or tap_response or ""
+    # Only accept typed input if it's non-empty after stripping whitespace.
+    # Prevents a blank/unchanged textbox from silently overriding a tap.
+    typed = (typed_response or "").strip()
+    response_text = spoken or typed or tap_response or ""
     cycle = tutor.answer(item, response_text)
     lang = cycle.lang_detected if response_text else "kin"
     feedback_text = tutor.feedback(cycle.item, cycle.correct, lang)
@@ -174,15 +180,22 @@ def build_ui() -> gr.Blocks:
                                   variant="secondary", size="lg")
 
         with gr.Group():
+            # Three parallel input paths — the child uses whichever one
+            # works for them. submit_answer honours an OR relationship:
+            # whichever channel has content wins, in a stable order.
             audio_in = gr.Audio(sources=["microphone"], type="filepath",
                                 label="Speak your answer")
-            # 0–20 tap covers 89 % of the curriculum (71 of 80 items).
-            # The 9 items with answers > 20 are all age band 8–9, and
-            # those older learners can use the mic — no need for a
-            # second input widget cluttering the UI for 6-year-olds.
             tap = gr.Radio(
                 choices=[str(i) for i in range(0, 21)],
                 label="Or tap a number (0–20)", value=None,
+            )
+            # Textbox (not gr.Number) because gr.Number on gradio 6.13
+            # silently renders a None default as 0, which poisoned the
+            # earlier 'always wrong' bug. Textbox truly starts empty.
+            typed = gr.Textbox(
+                label="Or type a bigger number",
+                value="", placeholder="e.g. 41",
+                interactive=True, lines=1, max_lines=1,
             )
             submit_btn = gr.Button("Submit", variant="primary", size="lg")
 
@@ -197,7 +210,7 @@ def build_ui() -> gr.Blocks:
         )
         submit_btn.click(
             submit_answer,
-            inputs=[audio_in, tap, age_band, learner, pending],
+            inputs=[audio_in, tap, typed, age_band, learner, pending],
             outputs=[prompt_box, prompt_image, prompt_audio, pending,
                      feedback_box, diag_box],
         )
