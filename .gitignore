@@ -25,6 +25,9 @@ tts_cache/
 # Generated parent reports
 reports/
 
+# Gradio local cache (flagged files, examples index, etc.)
+.gradio/
+
 # Audio corpus + training outputs (regeneratable from scripts/)
 data/child_utt/train/
 data/child_utt/eval/
