@@ -16,7 +16,8 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-from tutor.curriculum_loader import SKILLS
+from tutor.curriculum_loader import SKILLS, Curriculum
+from tutor.dyscalculia import flag_plateau
 from tutor.llm_head import LLMHead
 from tutor.storage import ProgressStore
 
@@ -94,17 +95,22 @@ def render_summary_wav(text: str, out_wav: Path, lang: str = "en") -> bool:
     return False
 
 
-def _aggregate(store: ProgressStore, learner_id: str, week_start: dt.date) -> dict:
+def _aggregate(
+    store: ProgressStore,
+    learner_id: str,
+    week_start: dt.date,
+    curriculum: Curriculum | None = None,
+) -> dict:
     week_end = week_start + dt.timedelta(days=7)
     week_start_ts = dt.datetime.combine(week_start, dt.time.min).timestamp()
     week_end_ts = dt.datetime.combine(week_end, dt.time.min).timestamp()
 
-    attempts = [
+    attempts_week = [
         a for a in store.replay(learner_id)
         if week_start_ts <= a.ts < week_end_ts
     ]
     by_skill: dict[str, list[bool]] = defaultdict(list)
-    for a in attempts:
+    for a in attempts_week:
         by_skill[a.skill_id].append(a.correct)
 
     skills_block: dict[str, dict[str, float]] = {}
@@ -113,13 +119,21 @@ def _aggregate(store: ProgressStore, learner_id: str, week_start: dt.date) -> di
         current = (sum(results) / len(results)) if results else 0.0
         skills_block[s] = {"current": round(current, 3), "delta": 0.0}
 
+    # Dyscalculia early-warning over the learner's FULL history — a
+    # plateau across sessions is more informative than within one week.
+    dyscalculia = flag_plateau(
+        store.replay(learner_id),
+        curriculum=curriculum,
+    ).to_dict()
+
     return {
         "learner_id": learner_id,
         "week_starting": week_start.isoformat(),
-        "sessions": len({int(a.ts // 3600) for a in attempts}),
+        "sessions": len({int(a.ts // 3600) for a in attempts_week}),
         "skills": skills_block,
         "icons_for_parent": ["overall_arrow", "best_skill", "needs_help"],
         "voiced_summary_audio": f"reports/{learner_id}/{week_start}/summary.wav",
+        "dyscalculia_flag": dyscalculia,
     }
 
 
@@ -141,6 +155,27 @@ def render_png(report: dict, out_path: Path) -> None:
     draw.text((40, 80), f"Sessions: {report['sessions']}", font=body_font, fill="black")
 
     y = 160
+
+    # Dyscalculia early-warning banner — gentle phrasing, warm colour.
+    dys = report.get("dyscalculia_flag") or {}
+    if dys.get("flagged"):
+        banner_h = 90
+        draw.rectangle([20, y, W - 20, y + banner_h], fill="#fff4d6", outline="#c89220", width=3)
+        draw.text((40, y + 8),
+                  "👋  A gentle note for the parent",
+                  font=body_font, fill="#7a5a10")
+        # Pillow's default font has no auto-wrap; hand-split at ~60 chars.
+        msg = dys.get("message_for_parent", "")
+        words, line, lines = msg.split(), "", []
+        for w in words:
+            if len(line) + len(w) + 1 > 60:
+                lines.append(line.strip()); line = ""
+            line += w + " "
+        if line.strip():
+            lines.append(line.strip())
+        for i, ln in enumerate(lines[:2]):
+            draw.text((40, y + 44 + i * 22), ln, font=body_font, fill="#333")
+        y += banner_h + 20
     for skill, data in report["skills"].items():
         score = data["current"]
         face = "🙂" if score >= 0.7 else "😐" if score >= 0.4 else "😟"
@@ -182,7 +217,14 @@ def main() -> None:
         week_start = today - dt.timedelta(days=today.weekday())
 
     store = ProgressStore()
-    report = _aggregate(store, args.learner_id, week_start)
+    # Pick up the full curriculum if present so the dyscalculia flag
+    # can use the "despite difficulty drops" signal. Falls back to
+    # correctness-only plateau detection if the file isn't there.
+    curriculum: Curriculum | None = None
+    curriculum_path = Path("data/T3.1_Math_Tutor/curriculum.json")
+    if curriculum_path.exists():
+        curriculum = Curriculum.from_json(curriculum_path)
+    report = _aggregate(store, args.learner_id, week_start, curriculum=curriculum)
 
     # Generate the voiced-summary narrative and render it to a WAV that
     # the QR code will point at.
