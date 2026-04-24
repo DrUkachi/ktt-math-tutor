@@ -25,6 +25,12 @@ tts_cache/
 # Generated parent reports
 reports/
 
+# Audio corpus + training outputs (regeneratable from scripts/)
+data/child_utt/train/
+data/child_utt/eval/
+data/child_utt/_adult_raw/
+outputs/
+
 # Build / OS
 .DS_Store
 Thumbs.db

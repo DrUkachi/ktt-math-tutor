@@ -1,0 +1,145 @@
+utt_id,audio_path,transcript_en,language,pitch_semitones,split
+U050_p030,data/child_utt/train/U050_p030.wav,it is eleven,en,3.0,train
+U050_p045,data/child_utt/train/U050_p045.wav,it is eleven,en,4.5,train
+U050_p060,data/child_utt/train/U050_p060.wav,it is eleven,en,6.0,train
+U037_p030,data/child_utt/train/U037_p030.wav,I see two books,en,3.0,train
+U037_p045,data/child_utt/train/U037_p045.wav,I see two books,en,4.5,train
+U037_p060,data/child_utt/train/U037_p060.wav,I see two books,en,6.0,train
+U053_p030,data/child_utt/train/U053_p030.wav,nine books,en,3.0,train
+U053_p045,data/child_utt/train/U053_p045.wav,nine books,en,4.5,train
+U053_p060,data/child_utt/train/U053_p060.wav,nine books,en,6.0,train
+U025_p030,data/child_utt/train/U025_p030.wav,it is fifteen,en,3.0,train
+U025_p045,data/child_utt/train/U025_p045.wav,it is fifteen,en,4.5,train
+U025_p060,data/child_utt/train/U025_p060.wav,it is fifteen,en,6.0,train
+U059_p030,data/child_utt/train/U059_p030.wav,there are fourteen cows,en,3.0,train
+U059_p045,data/child_utt/train/U059_p045.wav,there are fourteen cows,en,4.5,train
+U059_p060,data/child_utt/train/U059_p060.wav,there are fourteen cows,en,6.0,train
+U011_p030,data/child_utt/train/U011_p030.wav,it is one,en,3.0,train
+U011_p045,data/child_utt/train/U011_p045.wav,it is one,en,4.5,train
+U011_p060,data/child_utt/train/U011_p060.wav,it is one,en,6.0,train
+U057_p030,data/child_utt/train/U057_p030.wav,it is ten,en,3.0,train
+U057_p045,data/child_utt/train/U057_p045.wav,it is ten,en,4.5,train
+U057_p060,data/child_utt/train/U057_p060.wav,it is ten,en,6.0,train
+U054_p030,data/child_utt/train/U054_p030.wav,the answer is nine,en,3.0,train
+U054_p045,data/child_utt/train/U054_p045.wav,the answer is nine,en,4.5,train
+U054_p060,data/child_utt/train/U054_p060.wav,the answer is nine,en,6.0,train
+U021_p030,data/child_utt/train/U021_p030.wav,there are fourteen beads,en,3.0,train
+U021_p045,data/child_utt/train/U021_p045.wav,there are fourteen beads,en,4.5,train
+U021_p060,data/child_utt/train/U021_p060.wav,there are fourteen beads,en,6.0,train
+U026_p030,data/child_utt/train/U026_p030.wav,nine mangoes,en,3.0,train
+U026_p045,data/child_utt/train/U026_p045.wav,nine mangoes,en,4.5,train
+U026_p060,data/child_utt/train/U026_p060.wav,nine mangoes,en,6.0,train
+U055_p030,data/child_utt/train/U055_p030.wav,I see four mangoes,en,3.0,train
+U055_p045,data/child_utt/train/U055_p045.wav,I see four mangoes,en,4.5,train
+U055_p060,data/child_utt/train/U055_p060.wav,I see four mangoes,en,6.0,train
+U027_p030,data/child_utt/train/U027_p030.wav,I see fourteen drums,en,3.0,train
+U027_p045,data/child_utt/train/U027_p045.wav,I see fourteen drums,en,4.5,train
+U027_p060,data/child_utt/train/U027_p060.wav,I see fourteen drums,en,6.0,train
+U043_p030,data/child_utt/train/U043_p030.wav,there are eleven goats,en,3.0,train
+U043_p045,data/child_utt/train/U043_p045.wav,there are eleven goats,en,4.5,train
+U043_p060,data/child_utt/train/U043_p060.wav,there are eleven goats,en,6.0,train
+U009_p030,data/child_utt/train/U009_p030.wav,it is twelve,en,3.0,train
+U009_p045,data/child_utt/train/U009_p045.wav,it is twelve,en,4.5,train
+U009_p060,data/child_utt/train/U009_p060.wav,it is twelve,en,6.0,train
+U028_p030,data/child_utt/train/U028_p030.wav,the answer is five,en,3.0,train
+U028_p045,data/child_utt/train/U028_p045.wav,the answer is five,en,4.5,train
+U028_p060,data/child_utt/train/U028_p060.wav,the answer is five,en,6.0,train
+U056_p030,data/child_utt/train/U056_p030.wav,eight,en,3.0,train
+U056_p045,data/child_utt/train/U056_p045.wav,eight,en,4.5,train
+U056_p060,data/child_utt/train/U056_p060.wav,eight,en,6.0,train
+U042_p030,data/child_utt/train/U042_p030.wav,I see ten beads,en,3.0,train
+U042_p045,data/child_utt/train/U042_p045.wav,I see ten beads,en,4.5,train
+U042_p060,data/child_utt/train/U042_p060.wav,I see ten beads,en,6.0,train
+U010_p030,data/child_utt/train/U010_p030.wav,the answer is ten,en,3.0,train
+U010_p045,data/child_utt/train/U010_p045.wav,the answer is ten,en,4.5,train
+U010_p060,data/child_utt/train/U010_p060.wav,the answer is ten,en,6.0,train
+U032_p030,data/child_utt/train/U032_p030.wav,thirteen mangoes,en,3.0,train
+U032_p045,data/child_utt/train/U032_p045.wav,thirteen mangoes,en,4.5,train
+U032_p060,data/child_utt/train/U032_p060.wav,thirteen mangoes,en,6.0,train
+U046_p030,data/child_utt/train/U046_p030.wav,I see fifteen books,en,3.0,train
+U046_p045,data/child_utt/train/U046_p045.wav,I see fifteen books,en,4.5,train
+U046_p060,data/child_utt/train/U046_p060.wav,I see fifteen books,en,6.0,train
+U008_p030,data/child_utt/train/U008_p030.wav,twelve,en,3.0,train
+U008_p045,data/child_utt/train/U008_p045.wav,twelve,en,4.5,train
+U008_p060,data/child_utt/train/U008_p060.wav,twelve,en,6.0,train
+U044_p030,data/child_utt/train/U044_p030.wav,the answer is nine,en,3.0,train
+U044_p045,data/child_utt/train/U044_p045.wav,the answer is nine,en,4.5,train
+U044_p060,data/child_utt/train/U044_p060.wav,the answer is nine,en,6.0,train
+U016_p030,data/child_utt/train/U016_p030.wav,the answer is thirteen,en,3.0,train
+U016_p045,data/child_utt/train/U016_p045.wav,the answer is thirteen,en,4.5,train
+U016_p060,data/child_utt/train/U016_p060.wav,the answer is thirteen,en,6.0,train
+U018_p030,data/child_utt/train/U018_p030.wav,it is four,en,3.0,train
+U018_p045,data/child_utt/train/U018_p045.wav,it is four,en,4.5,train
+U018_p060,data/child_utt/train/U018_p060.wav,it is four,en,6.0,train
+U001_p030,data/child_utt/train/U001_p030.wav,the answer is ten,en,3.0,train
+U001_p045,data/child_utt/train/U001_p045.wav,the answer is ten,en,4.5,train
+U001_p060,data/child_utt/train/U001_p060.wav,the answer is ten,en,6.0,train
+U029_p030,data/child_utt/train/U029_p030.wav,I see fifteen mangoes,en,3.0,train
+U029_p045,data/child_utt/train/U029_p045.wav,I see fifteen mangoes,en,4.5,train
+U029_p060,data/child_utt/train/U029_p060.wav,I see fifteen mangoes,en,6.0,train
+U052_p030,data/child_utt/train/U052_p030.wav,there are thirteen books,en,3.0,train
+U052_p045,data/child_utt/train/U052_p045.wav,there are thirteen books,en,4.5,train
+U052_p060,data/child_utt/train/U052_p060.wav,there are thirteen books,en,6.0,train
+U045_p030,data/child_utt/train/U045_p030.wav,thirteen,en,3.0,train
+U045_p045,data/child_utt/train/U045_p045.wav,thirteen,en,4.5,train
+U045_p060,data/child_utt/train/U045_p060.wav,thirteen,en,6.0,train
+U005_p030,data/child_utt/train/U005_p030.wav,the answer is two,en,3.0,train
+U005_p045,data/child_utt/train/U005_p045.wav,the answer is two,en,4.5,train
+U005_p060,data/child_utt/train/U005_p060.wav,the answer is two,en,6.0,train
+U003_p030,data/child_utt/train/U003_p030.wav,there are thirteen mangoes,en,3.0,train
+U003_p045,data/child_utt/train/U003_p045.wav,there are thirteen mangoes,en,4.5,train
+U003_p060,data/child_utt/train/U003_p060.wav,there are thirteen mangoes,en,6.0,train
+U017_p030,data/child_utt/train/U017_p030.wav,there are nine goats,en,3.0,train
+U017_p045,data/child_utt/train/U017_p045.wav,there are nine goats,en,4.5,train
+U017_p060,data/child_utt/train/U017_p060.wav,there are nine goats,en,6.0,train
+U048_p030,data/child_utt/train/U048_p030.wav,I see six books,en,3.0,train
+U048_p045,data/child_utt/train/U048_p045.wav,I see six books,en,4.5,train
+U048_p060,data/child_utt/train/U048_p060.wav,I see six books,en,6.0,train
+U006_p030,data/child_utt/train/U006_p030.wav,fifteen,en,3.0,train
+U006_p045,data/child_utt/train/U006_p045.wav,fifteen,en,4.5,train
+U006_p060,data/child_utt/train/U006_p060.wav,fifteen,en,6.0,train
+U049_p030,data/child_utt/train/U049_p030.wav,I see six mangoes,en,3.0,train
+U049_p045,data/child_utt/train/U049_p045.wav,I see six mangoes,en,4.5,train
+U049_p060,data/child_utt/train/U049_p060.wav,I see six mangoes,en,6.0,train
+U038_p030,data/child_utt/train/U038_p030.wav,the answer is nine,en,3.0,train
+U038_p045,data/child_utt/train/U038_p045.wav,the answer is nine,en,4.5,train
+U038_p060,data/child_utt/train/U038_p060.wav,the answer is nine,en,6.0,train
+U036_p030,data/child_utt/train/U036_p030.wav,eight,en,3.0,train
+U036_p045,data/child_utt/train/U036_p045.wav,eight,en,4.5,train
+U036_p060,data/child_utt/train/U036_p060.wav,eight,en,6.0,train
+U012_p030,data/child_utt/train/U012_p030.wav,eleven,en,3.0,train
+U012_p045,data/child_utt/train/U012_p045.wav,eleven,en,4.5,train
+U012_p060,data/child_utt/train/U012_p060.wav,eleven,en,6.0,train
+U041_p030,data/child_utt/train/U041_p030.wav,five,en,3.0,train
+U041_p045,data/child_utt/train/U041_p045.wav,five,en,4.5,train
+U041_p060,data/child_utt/train/U041_p060.wav,five,en,6.0,train
+U015_p030,data/child_utt/train/U015_p030.wav,one beads,en,3.0,train
+U015_p045,data/child_utt/train/U015_p045.wav,one beads,en,4.5,train
+U015_p060,data/child_utt/train/U015_p060.wav,one beads,en,6.0,train
+U002_p030,data/child_utt/train/U002_p030.wav,five,en,3.0,train
+U002_p045,data/child_utt/train/U002_p045.wav,five,en,4.5,train
+U002_p060,data/child_utt/train/U002_p060.wav,five,en,6.0,train
+U039_p030,data/child_utt/train/U039_p030.wav,there are six mangoes,en,3.0,train
+U039_p045,data/child_utt/train/U039_p045.wav,there are six mangoes,en,4.5,train
+U039_p060,data/child_utt/train/U039_p060.wav,there are six mangoes,en,6.0,train
+U030_p030,data/child_utt/train/U030_p030.wav,I see seven beads,en,3.0,train
+U030_p045,data/child_utt/train/U030_p045.wav,I see seven beads,en,4.5,train
+U030_p060,data/child_utt/train/U030_p060.wav,I see seven beads,en,6.0,train
+U022_p030,data/child_utt/train/U022_p030.wav,two goats,en,3.0,train
+U022_p045,data/child_utt/train/U022_p045.wav,two goats,en,4.5,train
+U022_p060,data/child_utt/train/U022_p060.wav,two goats,en,6.0,train
+U058_p030,data/child_utt/train/U058_p030.wav,the answer is nine,en,3.0,train
+U058_p045,data/child_utt/train/U058_p045.wav,the answer is nine,en,4.5,train
+U058_p060,data/child_utt/train/U058_p060.wav,the answer is nine,en,6.0,train
+U051_p030,data/child_utt/train/U051_p030.wav,I see twelve apples,en,3.0,train
+U051_p045,data/child_utt/train/U051_p045.wav,I see twelve apples,en,4.5,train
+U051_p060,data/child_utt/train/U051_p060.wav,I see twelve apples,en,6.0,train
+U040_p030,data/child_utt/train/U040_p030.wav,one mangoes,en,3.0,train
+U040_p045,data/child_utt/train/U040_p045.wav,one mangoes,en,4.5,train
+U040_p060,data/child_utt/train/U040_p060.wav,one mangoes,en,6.0,train
+U060_p030,data/child_utt/train/U060_p030.wav,there are six apples,en,3.0,train
+U060_p045,data/child_utt/train/U060_p045.wav,there are six apples,en,4.5,train
+U060_p060,data/child_utt/train/U060_p060.wav,there are six apples,en,6.0,train
+U035_p030,data/child_utt/train/U035_p030.wav,twelve cows,en,3.0,train
+U035_p045,data/child_utt/train/U035_p045.wav,twelve cows,en,4.5,train
+U035_p060,data/child_utt/train/U035_p060.wav,twelve cows,en,6.0,train

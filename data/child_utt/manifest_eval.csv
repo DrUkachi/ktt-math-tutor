@@ -1,0 +1,37 @@
+utt_id,audio_path,transcript_en,language,pitch_semitones,split
+U020_p030,data/child_utt/eval/U020_p030.wav,it is fifteen,en,3.0,eval
+U020_p045,data/child_utt/eval/U020_p045.wav,it is fifteen,en,4.5,eval
+U020_p060,data/child_utt/eval/U020_p060.wav,it is fifteen,en,6.0,eval
+U023_p030,data/child_utt/eval/U023_p030.wav,twelve books,en,3.0,eval
+U023_p045,data/child_utt/eval/U023_p045.wav,twelve books,en,4.5,eval
+U023_p060,data/child_utt/eval/U023_p060.wav,twelve books,en,6.0,eval
+U034_p030,data/child_utt/eval/U034_p030.wav,it is nine,en,3.0,eval
+U034_p045,data/child_utt/eval/U034_p045.wav,it is nine,en,4.5,eval
+U034_p060,data/child_utt/eval/U034_p060.wav,it is nine,en,6.0,eval
+U019_p030,data/child_utt/eval/U019_p030.wav,the answer is thirteen,en,3.0,eval
+U019_p045,data/child_utt/eval/U019_p045.wav,the answer is thirteen,en,4.5,eval
+U019_p060,data/child_utt/eval/U019_p060.wav,the answer is thirteen,en,6.0,eval
+U033_p030,data/child_utt/eval/U033_p030.wav,there are eleven goats,en,3.0,eval
+U033_p045,data/child_utt/eval/U033_p045.wav,there are eleven goats,en,4.5,eval
+U033_p060,data/child_utt/eval/U033_p060.wav,there are eleven goats,en,6.0,eval
+U047_p030,data/child_utt/eval/U047_p030.wav,I see four mangoes,en,3.0,eval
+U047_p045,data/child_utt/eval/U047_p045.wav,I see four mangoes,en,4.5,eval
+U047_p060,data/child_utt/eval/U047_p060.wav,I see four mangoes,en,6.0,eval
+U014_p030,data/child_utt/eval/U014_p030.wav,four mangoes,en,3.0,eval
+U014_p045,data/child_utt/eval/U014_p045.wav,four mangoes,en,4.5,eval
+U014_p060,data/child_utt/eval/U014_p060.wav,four mangoes,en,6.0,eval
+U013_p030,data/child_utt/eval/U013_p030.wav,fifteen,en,3.0,eval
+U013_p045,data/child_utt/eval/U013_p045.wav,fifteen,en,4.5,eval
+U013_p060,data/child_utt/eval/U013_p060.wav,fifteen,en,6.0,eval
+U004_p030,data/child_utt/eval/U004_p030.wav,there are eleven mangoes,en,3.0,eval
+U004_p045,data/child_utt/eval/U004_p045.wav,there are eleven mangoes,en,4.5,eval
+U004_p060,data/child_utt/eval/U004_p060.wav,there are eleven mangoes,en,6.0,eval
+U031_p030,data/child_utt/eval/U031_p030.wav,eight,en,3.0,eval
+U031_p045,data/child_utt/eval/U031_p045.wav,eight,en,4.5,eval
+U031_p060,data/child_utt/eval/U031_p060.wav,eight,en,6.0,eval
+U024_p030,data/child_utt/eval/U024_p030.wav,it is two,en,3.0,eval
+U024_p045,data/child_utt/eval/U024_p045.wav,it is two,en,4.5,eval
+U024_p060,data/child_utt/eval/U024_p060.wav,it is two,en,6.0,eval
+U007_p030,data/child_utt/eval/U007_p030.wav,there are seven beads,en,3.0,eval
+U007_p045,data/child_utt/eval/U007_p045.wav,there are seven beads,en,4.5,eval
+U007_p060,data/child_utt/eval/U007_p060.wav,there are seven beads,en,6.0,eval

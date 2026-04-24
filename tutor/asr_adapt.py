@@ -29,6 +29,9 @@ _MODEL_CACHE = Path(os.environ.get(
     "WHISPER_CACHE_DIR",
     str(Path.home() / ".cache" / "whisper-tiny-ct2"),
 ))
+# Tuned child-voice model shipped inside the repo. If present, this is
+# preferred over the fresh cache download (see ChildASR._load).
+_TUNED_MODEL = Path(__file__).resolve().parent / "asr_model"
 
 
 class ChildASR:
@@ -60,23 +63,31 @@ class ChildASR:
                 "Run `pip install faster-whisper`."
             ) from e
 
-        # Prefer an explicitly-provided converted model.
+        # Resolution order:
+        #   1. Explicit ``model_path`` (for eval scripts that want a
+        #      specific model).
+        #   2. ``tutor/asr_model/`` — the child-voice LoRA-tuned CT2
+        #      int8 model that ships in this repo.
+        #   3. Vanilla whisper-tiny downloaded to ``cache_dir`` on
+        #      first use.
         if self.model_path is not None and self.model_path.exists():
+            chosen = self.model_path
+        elif _TUNED_MODEL.exists() and (_TUNED_MODEL / "model.bin").exists():
+            chosen = _TUNED_MODEL
+        else:
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
             self._model = WhisperModel(
-                str(self.model_path),
+                self.model_size,
                 device="cpu",
                 compute_type=self.compute_type,
+                download_root=str(self.cache_dir),
             )
             return
 
-        # Else fall back to the vanilla HF model; faster-whisper will
-        # download + convert into ``cache_dir`` on first use.
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._model = WhisperModel(
-            self.model_size,
+            str(chosen),
             device="cpu",
             compute_type=self.compute_type,
-            download_root=str(self.cache_dir),
         )
 
     def transcribe(self, wav: np.ndarray, lang: str = "en") -> str:
