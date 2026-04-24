@@ -36,6 +36,7 @@ from tutor.asr_adapt import augment_for_training
 
 
 PIPER_VOICE = Path.home() / ".local" / "share" / "piper-voices" / "en_US-lessac-medium.onnx"
+MUSAN_NOISE_DIR = Path(__file__).resolve().parent.parent / "data" / "musan" / "noise"
 
 NUMBERS_EN = ["one", "two", "three", "four", "five",
               "six", "seven", "eight", "nine", "ten",
@@ -53,6 +54,36 @@ TEMPLATES = [
 ]
 
 PITCH_STEPS = (3.0, 4.5, 6.0)
+NOISE_SNR_DB = 12.0  # Brief-specified SNR for the classroom-noise overlay.
+
+
+def _list_musan_noise_clips() -> list[Path]:
+    """Return the list of MUSAN .wav clips available for overlay.
+
+    Returns an empty list if the MUSAN subset hasn't been downloaded
+    yet — caller then builds a noise-free corpus, which is strictly
+    worse but keeps the pipeline runnable.
+    """
+    if not MUSAN_NOISE_DIR.exists():
+        return []
+    return sorted(MUSAN_NOISE_DIR.rglob("*.wav"))
+
+
+def _pick_noise_clip(
+    rng: random.Random,
+    pool: list[Path],
+) -> np.ndarray | None:
+    """Load one random MUSAN clip resampled to 16 kHz mono, or None."""
+    if not pool:
+        return None
+    p = rng.choice(pool)
+    wav, sr = sf.read(p, dtype="float32")
+    if wav.ndim > 1:
+        wav = wav.mean(axis=1)
+    if sr != 16000:
+        import librosa
+        wav = librosa.resample(wav, orig_sr=sr, target_sr=16000)
+    return wav.astype(np.float32)
 
 
 def piper_synth(text: str, out_wav: Path) -> None:
@@ -111,6 +142,13 @@ def main() -> None:
 
     rows_by_split: dict[str, list[dict]] = {"train": [], "eval": []}
 
+    noise_pool = _list_musan_noise_clips()
+    if noise_pool:
+        print(f"MUSAN noise pool: {len(noise_pool)} clips at {NOISE_SNR_DB} dB SNR")
+    else:
+        print(f"WARNING: {MUSAN_NOISE_DIR} empty — corpus will be clean (no noise overlay).")
+        print("         Run: python scripts/download_musan.py")
+
     for split_name, utt_list in split.items():
         split_dir = out_dir / split_name
         split_dir.mkdir(parents=True, exist_ok=True)
@@ -120,7 +158,15 @@ def main() -> None:
                 piper_synth(text, adult_wav)
             wav = _load_resample_16k(adult_wav)
             for semis in PITCH_STEPS:
-                shifted = augment_for_training(wav, sr=16000, pitch_semitones=semis)
+                # One random classroom-noise clip per pitch variant, so
+                # the same utterance shows up under different noise
+                # conditions — this is what the brief calls for and
+                # what makes the LoRA see real-world-ish signal.
+                noise = _pick_noise_clip(rng, noise_pool)
+                shifted = augment_for_training(
+                    wav, sr=16000, pitch_semitones=semis,
+                    noise_clip=noise, snr_db=NOISE_SNR_DB,
+                )
                 out_wav = split_dir / f"{utt_id}_p{int(semis*10):03d}.wav"
                 sf.write(out_wav, shifted, 16000)
                 rows_by_split[split_name].append({
@@ -129,6 +175,8 @@ def main() -> None:
                     "transcript_en": text,
                     "language": "en",
                     "pitch_semitones": semis,
+                    "noise_overlay": "musan" if noise is not None else "none",
+                    "snr_db": NOISE_SNR_DB if noise is not None else None,
                     "split": split_name,
                 })
 
