@@ -126,21 +126,38 @@ def _score_bkt(train: list[dict], test: list[dict]) -> tuple[list[float], list[i
 
 
 def _score_dkt(train: list[dict], test: list[dict]) -> tuple[list[float], list[int]]:
+    """Train a DKT on the train-learner trajectories, then roll through
+    test learners predicting each suffix attempt from the prefix.
+
+    The DKT directly outputs p(next correct), so we do NOT re-apply
+    slip/guess here — that would double-count the observation noise.
+    """
     from collections import defaultdict
+
+    skill_to_idx = {s: i for i, s in enumerate(SKILLS)}
+    dkt = DKT(n_skills=len(SKILLS), hidden=32, skill_to_idx=skill_to_idx)
+
+    # Bundle train attempts into per-learner trajectories.
+    train_by_learner: dict[str, list[tuple[str, bool]]] = defaultdict(list)
+    for a in train:
+        train_by_learner[a["learner_id"]].append((a["skill_id"], bool(a["correct"])))
+    trajectories = list(train_by_learner.values())
+    print(f"  DKT: fitting on {len(trajectories)} learner trajectories...")
+    dkt.fit(trajectories, epochs=40, lr=5e-3)
 
     ps: list[float] = []
     ys: list[int] = []
-    by_learner: dict[str, list[dict]] = defaultdict(list)
+    test_by_learner: dict[str, list[dict]] = defaultdict(list)
     for a in test:
-        by_learner[a["learner_id"]].append(a)
-    for lid, attempts in by_learner.items():
+        test_by_learner[a["learner_id"]].append(a)
+    for lid, attempts in test_by_learner.items():
+        dkt.reset()
         mid = max(1, len(attempts) // 2)
-        dkt = DKT(n_skills=len(SKILLS))
         for a in attempts[:mid]:
             dkt.update(a["skill_id"], a["correct"])
         for a in attempts[mid:]:
-            p = dkt.mastery(a["skill_id"])
-            p_correct = p * (1 - SLIP) + (1 - p) * GUESS
+            # DKT output is already p(next correct); no slip/guess.
+            p_correct = dkt.mastery(a["skill_id"])
             ps.append(float(p_correct))
             ys.append(int(a["correct"]))
             dkt.update(a["skill_id"], a["correct"])
@@ -171,8 +188,8 @@ def _score_elo(train: list[dict], test: list[dict]) -> tuple[list[float], list[i
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default="reports/kt_eval.json")
-    parser.add_argument("--n-learners", type=int, default=80)
-    parser.add_argument("--n-attempts", type=int, default=50)
+    parser.add_argument("--n-learners", type=int, default=200)
+    parser.add_argument("--n-attempts", type=int, default=60)
     parser.add_argument("--seed", type=int, default=7)
     args = parser.parse_args()
 

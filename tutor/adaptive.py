@@ -74,19 +74,37 @@ class BKT:
 # Deep Knowledge Tracing (tiny GRU)
 # ---------------------------------------------------------------------------
 class DKT:
-    """Tiny GRU DKT. Lazy-imports torch so the package imports cheaply."""
+    """Tiny GRU DKT with a real backprop trainer.
 
-    def __init__(self, n_skills: int = 5, hidden: int = 32):
+    Input  : one-hot ``[skill_id, correct_flag]`` ∈ ℝ^{2·n_skills}.
+             First ``n_skills`` cells are active when correct=True;
+             next ``n_skills`` when correct=False.
+    Output : per-skill next-correct logits. Sigmoid is applied only at
+             readout so training uses ``binary_cross_entropy_with_logits``.
+
+    Usage::
+
+        dkt = DKT(skill_to_idx={"counting": 0, ...})
+        dkt.fit(train_trajectories, epochs=40)          # GPU-free, 32-dim hidden
+        dkt.reset(); dkt.update("counting", True)
+        dkt.mastery("counting")                          # p(next attempt correct)
+    """
+
+    def __init__(
+        self,
+        n_skills: int = 5,
+        hidden: int = 32,
+        skill_to_idx: dict[str, int] | None = None,
+    ):
         self.n_skills = n_skills
         self.hidden = hidden
-        self._model = None  # torch.nn.GRU built on first call
+        self._model = None
         self._h = None
-        self._skill_to_idx: dict[str, int] = {}
+        self._skill_to_idx: dict[str, int] = dict(skill_to_idx or {})
 
     def _ensure_model(self) -> None:
         if self._model is not None:
             return
-        import torch
         import torch.nn as nn
 
         class _Net(nn.Module):
@@ -97,19 +115,34 @@ class DKT:
 
             def forward(self, x, h=None):
                 y, h2 = self.gru(x, h)
-                return torch.sigmoid(self.out(y)), h2
+                return self.out(y), h2  # logits; sigmoid at eval only
 
         self._model = _Net(self.n_skills, self.hidden)
 
     def _idx(self, skill_id: str) -> int:
-        return self._skill_to_idx.setdefault(skill_id, len(self._skill_to_idx))
+        if skill_id not in self._skill_to_idx:
+            # Cap at n_skills; extras map to the last bucket (shouldn't
+            # happen if the caller passes the canonical skill list).
+            self._skill_to_idx[skill_id] = min(
+                len(self._skill_to_idx), self.n_skills - 1
+            )
+        return self._skill_to_idx[skill_id]
+
+    def _encode(self, skill_id: str, correct: bool):
+        import torch
+        idx = self._idx(skill_id)
+        x = torch.zeros(1, 1, self.n_skills * 2)
+        # Correct=first block so the signal is unambiguous at readout.
+        x[0, 0, idx + (0 if correct else self.n_skills)] = 1.0
+        return x
+
+    def reset(self) -> None:
+        self._h = None
 
     def update(self, skill_id: str, correct: bool) -> None:
         self._ensure_model()
         import torch
-        idx = self._idx(skill_id)
-        x = torch.zeros(1, 1, self.n_skills * 2)
-        x[0, 0, idx + (self.n_skills if correct else 0)] = 1.0
+        x = self._encode(skill_id, correct)
         with torch.no_grad():
             _, self._h = self._model(x, self._h)
 
@@ -120,8 +153,79 @@ class DKT:
         if self._h is None:
             return 0.5
         with torch.no_grad():
-            probs = torch.sigmoid(self._model.out(self._h[-1]))
+            logits = self._model.out(self._h[-1])
+            probs = torch.sigmoid(logits)
         return float(probs[0, idx].item())
+
+    def fit(
+        self,
+        trajectories: list[list[tuple[str, bool]]],
+        epochs: int = 40,
+        lr: float = 5e-3,
+    ) -> "DKT":
+        """Train on a list of per-learner (skill, correct) sequences.
+
+        Objective: given the GRU output after step t, predict whether
+        the attempt at step t+1 on its skill will be correct. Standard
+        DKT next-response loss.
+        """
+        self._ensure_model()
+        import torch
+        import torch.nn.functional as F
+
+        # Pre-register the full skill vocabulary so indexing is stable.
+        for traj in trajectories:
+            for skill, _ in traj:
+                self._idx(skill)
+
+        opt = torch.optim.Adam(self._model.parameters(), lr=lr)
+        device = next(self._model.parameters()).device
+        for epoch in range(epochs):
+            total = 0.0
+            n = 0
+            for traj in trajectories:
+                if len(traj) < 2:
+                    continue
+                # Build per-step input and next-step supervision.
+                xs = [self._encode(s, c).squeeze(0) for s, c in traj]
+                skill_idx = [self._idx(s) for s, _ in traj]
+                ys = [1.0 if c else 0.0 for _, c in traj]
+                x = torch.cat(xs, dim=0).unsqueeze(0).to(device)  # [1, T, 2n]
+                logits, _ = self._model(x)  # [1, T, n_skills]
+                # Predict attempt t+1 from hidden at t.
+                pred = logits[0, :-1, :]  # [T-1, n_skills]
+                target_idx = torch.tensor(skill_idx[1:], device=device)
+                target_y = torch.tensor(ys[1:], device=device)
+                picked = pred.gather(1, target_idx.unsqueeze(-1)).squeeze(-1)
+                loss = F.binary_cross_entropy_with_logits(picked, target_y)
+                opt.zero_grad()
+                loss.backward()
+                opt.step()
+                total += loss.item()
+                n += 1
+        return self
+
+    def save(self, path: str | "Path") -> None:
+        from pathlib import Path as _Path
+        import torch
+        self._ensure_model()
+        _Path(path).parent.mkdir(parents=True, exist_ok=True)
+        torch.save({
+            "state_dict": self._model.state_dict(),
+            "skill_to_idx": self._skill_to_idx,
+            "n_skills": self.n_skills,
+            "hidden": self.hidden,
+        }, str(path))
+
+    @classmethod
+    def load(cls, path: str | "Path") -> "DKT":
+        import torch
+        blob = torch.load(str(path), map_location="cpu", weights_only=False)
+        dkt = cls(n_skills=blob["n_skills"], hidden=blob["hidden"],
+                  skill_to_idx=blob["skill_to_idx"])
+        dkt._ensure_model()
+        dkt._model.load_state_dict(blob["state_dict"])
+        return dkt
 
     def pick_next(self, items: list[Item]) -> Item:
         def gap(it: Item) -> float:
