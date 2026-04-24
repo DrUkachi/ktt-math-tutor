@@ -24,6 +24,135 @@ python generate_curriculum.py --out data/T3.1_Math_Tutor/ && python demo.py
 optional weekly-summary LLM, additionally run
 `python scripts/download_llm.py` (downloads ~637 MB to `~/.cache/llm/`).
 
+## How to run — step by step
+
+All steps below work on a **free Google Colab CPU runtime** (no GPU
+required) and on any Linux / macOS with Python ≥ 3.10.
+
+### 0. Open in Google Colab
+
+Create a new Colab notebook → `Runtime` → `Change runtime type` →
+**CPU**. Paste each block below into its own cell in order.
+
+### 1. Clone and install
+
+```bash
+!git clone https://github.com/DrUkachi/ktt-math-tutor.git
+%cd ktt-math-tutor
+!pip install -r requirements.txt
+```
+
+That's everything the core app needs. Nothing else has to be
+downloaded at runtime — the 44 MB child-voice ASR ships in
+`tutor/asr_model/`.
+
+### 2. Regenerate data (optional — the repo already ships this)
+
+```bash
+!python generate_curriculum.py --out data/T3.1_Math_Tutor/
+!python scripts/render_scenes.py --out assets/
+```
+
+Produces the 80-item curriculum and the 70 rendered scene PNGs in
+< 10 seconds.
+
+### 3. Sanity tests
+
+```bash
+!pytest tests/ -q
+```
+
+Expected: **27 passed**.
+
+### 4. Run one inference cycle from Python
+
+```python
+from tutor.inference import Tutor
+t = Tutor(learner_id='colab_demo',
+          curriculum_path='data/T3.1_Math_Tutor/curriculum.json')
+item = t.next_item(age_band='6-7')
+print('Prompt:', item.stem('en'), '(answer:', item.answer_int, ')')
+cycle = t.step(age_band='6-7', response_text=str(item.answer_int))
+print('Correct:', cycle.correct, '  latency:', cycle.response_ms, 'ms')
+print('Feedback:', t.feedback(cycle.item, cycle.correct, 'en'))
+```
+
+Expected: correct=True, latency ~0 ms (tutor step only — ASR is
+warmed separately).
+
+### 5. Launch the Gradio demo with a public URL
+
+```bash
+!python demo.py --share
+```
+
+Look for a `https://*.gradio.live` URL in the output. Open it in a
+new browser tab. **First ASR call takes ~6 s** (cold CT2 load); warm
+calls are ~500 ms.
+
+### 6. Latency benchmark on CPU
+
+```bash
+!python scripts/bench_latency.py --cycles 20
+```
+
+Expected (free Colab CPU): mean ~1.2 s, p95 ~1.6 s, max < 2.5 s.
+The full 2.5 s budget from the brief is the gate.
+
+### 7. Generate the parent report
+
+```bash
+!python scripts/seed_progress.py   # seeds 3 demo learners with a week of attempts
+!python parent_report.py --learner-id learner_lion
+```
+
+Writes `reports/learner_lion/<week>/report.png` + `report.json` +
+`summary.wav`. Open the PNG inline in Colab with:
+
+```python
+from IPython.display import Image, display
+import glob
+display(Image(glob.glob('reports/learner_lion/*/report.png')[0]))
+```
+
+### 8. Optional: enable the natural-language LLM head
+
+The app works without this. To enable natural-language weekly summaries:
+
+```bash
+!python scripts/download_llm.py   # ~637 MB TinyLlama Q4_K_M to ~/.cache/llm/
+!python parent_report.py --learner-id learner_lion
+```
+
+The summary text in the parent report and the TTS WAV behind the QR
+code will now come from the QLoRA-tuned TinyLlama instead of the
+deterministic fallback.
+
+### 9. Optional: re-train either adapter on a GPU
+
+Colab's free T4 works for both. Switch `Runtime` → **T4 GPU** first.
+
+```bash
+!python scripts/build_child_corpus.py                  # synth corpus
+!python scripts/train_whisper_lora.py --epochs 4       # child-voice ASR
+!python scripts/train_llm_qlora.py --epochs 2          # numeracy LLM
+```
+
+`tutor/asr_model/` is overwritten; the new TinyLlama GGUF lands at
+`~/.cache/llm/tinyllama-numeracy-Q4_K_M.gguf`. Switch runtime back
+to CPU and re-run step 5 to confirm CPU inference still works.
+
+### Troubleshooting
+
+- **"Module not found: tutor"** — run commands from the repo root
+  (`/content/ktt-math-tutor` in Colab). A `conftest.py` injects this
+  path for pytest automatically.
+- **Gradio mic blocked on Colab** — the demo also accepts a tapped
+  number (radio 1–10); no mic required.
+- **First ASR call takes 6 s** — that's the CT2 model loading.
+  Subsequent calls are ~500 ms. Pre-warm in a hidden cell before
+  screen-sharing.
+
 ## Headline numbers
 
 | Metric                                             | Value   | Budget  | Source                                       |
@@ -34,7 +163,7 @@ optional weekly-summary LLM, additionally run
 | Child-voice WER after LoRA (ships in `tutor/asr_model/`) | **0.0000** | —       | [metrics/wer_tuned.json](metrics/wer_tuned.json) |
 | Knowledge-tracing AUC (200 learners × 60 attempts) | BKT **0.577** · Elo **0.561** · DKT **0.520** | > 0.50 | [metrics/kt_eval.json](metrics/kt_eval.json) |
 | Curriculum items × sub-skills                      | **80 × 5**  | ≥ 60    | [generate_curriculum.py](generate_curriculum.py) |
-| Tests                                              | 23 green  | —       | `pytest tests/ -q`                           |
+| Tests                                              | 27 green  | —       | `pytest tests/ -q`                           |
 
 ---
 

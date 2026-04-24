@@ -144,12 +144,24 @@ def render_png(report: dict, out_path: Path) -> None:
     W, H = 800, 1000
     img = Image.new("RGB", (W, H), "white")
     draw = ImageDraw.Draw(img)
-    try:
-        title_font = ImageFont.truetype("arial.ttf", 36)
-        body_font = ImageFont.truetype("arial.ttf", 28)
-    except (OSError, IOError):
-        title_font = ImageFont.load_default()
-        body_font = ImageFont.load_default()
+    # DejaVu ships with most Linux distros (including the one the scene
+    # renderer already relies on). Falls back to Arial, then to PIL's
+    # built-in bitmap font if neither is present.
+    _font_candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "arial.ttf",
+    ]
+    title_font = body_font = None
+    for p in _font_candidates:
+        try:
+            title_font = ImageFont.truetype(p, 36)
+            body_font = ImageFont.truetype(p, 24)
+            break
+        except (OSError, IOError):
+            continue
+    if title_font is None or body_font is None:
+        title_font = body_font = ImageFont.load_default()
 
     draw.text((40, 30), f"Week of {report['week_starting']}", font=title_font, fill="black")
     draw.text((40, 80), f"Sessions: {report['sessions']}", font=body_font, fill="black")
@@ -159,27 +171,34 @@ def render_png(report: dict, out_path: Path) -> None:
     # Dyscalculia early-warning banner — gentle phrasing, warm colour.
     dys = report.get("dyscalculia_flag") or {}
     if dys.get("flagged"):
-        banner_h = 90
-        draw.rectangle([20, y, W - 20, y + banner_h], fill="#fff4d6", outline="#c89220", width=3)
-        draw.text((40, y + 8),
-                  "👋  A gentle note for the parent",
-                  font=body_font, fill="#7a5a10")
-        # Pillow's default font has no auto-wrap; hand-split at ~60 chars.
+        # Hand-wrap at ~52 chars for DejaVu 24pt inside the banner width.
         msg = dys.get("message_for_parent", "")
         words, line, lines = msg.split(), "", []
         for w in words:
-            if len(line) + len(w) + 1 > 60:
+            if len(line) + len(w) + 1 > 52:
                 lines.append(line.strip()); line = ""
             line += w + " "
         if line.strip():
             lines.append(line.strip())
-        for i, ln in enumerate(lines[:2]):
-            draw.text((40, y + 44 + i * 22), ln, font=body_font, fill="#333")
+        banner_h = 44 + max(1, min(4, len(lines))) * 28
+        draw.rectangle([20, y, W - 20, y + banner_h], fill="#fff4d6",
+                       outline="#c89220", width=3)
+        draw.text((40, y + 10),
+                  "A gentle note for the parent",
+                  font=body_font, fill="#7a5a10")
+        for i, ln in enumerate(lines[:4]):
+            draw.text((40, y + 44 + i * 28), ln, font=body_font, fill="#333")
         y += banner_h + 20
     for skill, data in report["skills"].items():
         score = data["current"]
-        face = "🙂" if score >= 0.7 else "😐" if score >= 0.4 else "😟"
-        draw.text((40, y), f"{face}  {skill.replace('_', ' ').title()}",
+        # Use glyphs DejaVu renders cleanly (✓ / ~ / !) instead of emoji.
+        marker, marker_colour = (
+            ("✓", "#2e9b3a") if score >= 0.7 else
+            ("•", "#e89b1d") if score >= 0.4 else
+            ("!",      "#c0392b")
+        )
+        draw.text((40, y), marker, font=title_font, fill=marker_colour)
+        draw.text((80, y + 6), skill.replace('_', ' ').title(),
                   font=body_font, fill="black")
         bar_x, bar_y, bar_w, bar_h = 360, y + 8, 360, 28
         draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h], outline="black")
@@ -192,8 +211,12 @@ def render_png(report: dict, out_path: Path) -> None:
         import qrcode
         qr = qrcode.make(report["voiced_summary_audio"]).resize((180, 180))
         img.paste(qr, (W - 220, H - 220))
-        draw.text((W - 220, H - 40), "Scan for voice summary",
-                  font=body_font, fill="black")
+        try:
+            caption_font = ImageFont.truetype(_font_candidates[0], 18)
+        except (OSError, IOError):
+            caption_font = body_font
+        draw.text((W - 280, H - 34), "Scan for voice summary",
+                  font=caption_font, fill="black")
     except ImportError:
         pass
 
