@@ -1,0 +1,6 @@
+utt_id,audio_path,transcript_en,language,correctness
+U001,audio/u001.wav,five,en,great
+U002,audio/u002.wav,tu,fr,ok
+U003,audio/u003.wav,esheshatu,kin,great
+U004,audio/u004.wav,twewenti,en,poor
+U005,audio/u005.wav,neuf,fr,great

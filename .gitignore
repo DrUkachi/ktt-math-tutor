@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Models / large artifacts (host on HF Hub)
+*.gguf
+*.onnx
+*.pt
+*.bin
+*.safetensors
+
+# TTS cache (excluded from 75 MB footprint per brief)
+tts_cache/
+
+# Local databases
+*.db
+*.db-journal
+*.sqlite
+
+# Build / OS
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/
+build/
+dist/
+
+# Editor
+.vscode/
+.idea/
+*.swp

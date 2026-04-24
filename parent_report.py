@@ -1,0 +1,126 @@
+"""Generate the weekly 1-page parent report from the local SQLite store.
+
+Output (per learner per week):
+- 5 horizontal "filling-cup" bars, one per skill, coloured red/amber/green.
+- Smiley / neutral / sad face per skill.
+- A QR code → 30-second voiced summary in the parent's chosen language.
+- One concrete suggestion icon (e.g. "count goats with your child at home").
+
+Schema is in ``data/T3.1_Math_Tutor/parent_report_schema.json``.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+from collections import defaultdict
+from pathlib import Path
+
+from tutor.curriculum_loader import SKILLS
+from tutor.storage import ProgressStore
+
+
+def _aggregate(store: ProgressStore, learner_id: str, week_start: dt.date) -> dict:
+    week_end = week_start + dt.timedelta(days=7)
+    week_start_ts = dt.datetime.combine(week_start, dt.time.min).timestamp()
+    week_end_ts = dt.datetime.combine(week_end, dt.time.min).timestamp()
+
+    attempts = [
+        a for a in store.replay(learner_id)
+        if week_start_ts <= a.ts < week_end_ts
+    ]
+    by_skill: dict[str, list[bool]] = defaultdict(list)
+    for a in attempts:
+        by_skill[a.skill_id].append(a.correct)
+
+    skills_block: dict[str, dict[str, float]] = {}
+    for s in SKILLS:
+        results = by_skill.get(s, [])
+        current = (sum(results) / len(results)) if results else 0.0
+        skills_block[s] = {"current": round(current, 3), "delta": 0.0}
+
+    return {
+        "learner_id": learner_id,
+        "week_starting": week_start.isoformat(),
+        "sessions": len({int(a.ts // 3600) for a in attempts}),
+        "skills": skills_block,
+        "icons_for_parent": ["overall_arrow", "best_skill", "needs_help"],
+        "voiced_summary_audio": f"reports/{learner_id}/{week_start}/summary.wav",
+    }
+
+
+def render_png(report: dict, out_path: Path) -> None:
+    """Render the 1-pager as a PNG. Uses Pillow only — no matplotlib bloat."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    W, H = 800, 1000
+    img = Image.new("RGB", (W, H), "white")
+    draw = ImageDraw.Draw(img)
+    try:
+        title_font = ImageFont.truetype("arial.ttf", 36)
+        body_font = ImageFont.truetype("arial.ttf", 28)
+    except (OSError, IOError):
+        title_font = ImageFont.load_default()
+        body_font = ImageFont.load_default()
+
+    draw.text((40, 30), f"Week of {report['week_starting']}", font=title_font, fill="black")
+    draw.text((40, 80), f"Sessions: {report['sessions']}", font=body_font, fill="black")
+
+    y = 160
+    for skill, data in report["skills"].items():
+        score = data["current"]
+        face = "🙂" if score >= 0.7 else "😐" if score >= 0.4 else "😟"
+        draw.text((40, y), f"{face}  {skill.replace('_', ' ').title()}",
+                  font=body_font, fill="black")
+        bar_x, bar_y, bar_w, bar_h = 360, y + 8, 360, 28
+        draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h], outline="black")
+        fill_w = int(bar_w * score)
+        colour = "#2e9b3a" if score >= 0.7 else "#e89b1d" if score >= 0.4 else "#c0392b"
+        draw.rectangle([bar_x, bar_y, bar_x + fill_w, bar_y + bar_h], fill=colour)
+        y += 70
+
+    try:
+        import qrcode
+        qr = qrcode.make(report["voiced_summary_audio"]).resize((180, 180))
+        img.paste(qr, (W - 220, H - 220))
+        draw.text((W - 220, H - 40), "Scan for voice summary",
+                  font=body_font, fill="black")
+    except ImportError:
+        pass
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out_path)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--learner-id", required=True)
+    parser.add_argument("--week-start", default=None,
+                        help="YYYY-MM-DD; defaults to last Monday.")
+    parser.add_argument("--out-png", default=None)
+    parser.add_argument("--out-json", default=None)
+    args = parser.parse_args()
+
+    if args.week_start:
+        week_start = dt.date.fromisoformat(args.week_start)
+    else:
+        today = dt.date.today()
+        week_start = today - dt.timedelta(days=today.weekday())
+
+    store = ProgressStore()
+    report = _aggregate(store, args.learner_id, week_start)
+
+    out_json = Path(args.out_json or
+                    f"reports/{args.learner_id}/{week_start}/report.json")
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_json, "w", encoding="utf-8") as fh:
+        json.dump(report, fh, indent=2)
+
+    out_png = Path(args.out_png or
+                   f"reports/{args.learner_id}/{week_start}/report.png")
+    render_png(report, out_png)
+    print(f"Wrote {out_json} and {out_png}")
+
+
+if __name__ == "__main__":
+    main()

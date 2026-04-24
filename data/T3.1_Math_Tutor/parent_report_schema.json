@@ -1,0 +1,33 @@
+{
+  "learner_id": "string",
+  "week_starting": "YYYY-MM-DD",
+  "sessions": "int",
+  "skills": {
+    "counting": {
+      "current": "float [0,1]",
+      "delta": "float"
+    },
+    "addition": {
+      "current": "float [0,1]",
+      "delta": "float"
+    },
+    "subtraction": {
+      "current": "float [0,1]",
+      "delta": "float"
+    },
+    "word_problem": {
+      "current": "float [0,1]",
+      "delta": "float"
+    },
+    "number_sense": {
+      "current": "float [0,1]",
+      "delta": "float"
+    }
+  },
+  "icons_for_parent": [
+    "overall_arrow",
+    "best_skill",
+    "needs_help"
+  ],
+  "voiced_summary_audio": "string (path)"
+}

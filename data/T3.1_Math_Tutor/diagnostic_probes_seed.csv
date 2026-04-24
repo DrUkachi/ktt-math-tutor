@@ -1,0 +1,6 @@
+id,skill,difficulty,answer_int
+P001,counting,2,4
+P002,addition,4,7
+P003,subtraction,5,3
+P004,word_problem,6,9
+P005,number_sense,3,8

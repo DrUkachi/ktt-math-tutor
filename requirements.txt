@@ -1,0 +1,37 @@
+# Core
+numpy>=1.26
+scipy>=1.11
+pandas>=2.1
+
+# Audio + ASR
+librosa>=0.10
+soundfile>=0.12
+onnxruntime>=1.17
+# whisper-tiny is loaded via onnxruntime from a quantised .onnx
+
+# LLM head (CPU inference of GGUF)
+llama-cpp-python>=0.2.70
+
+# Knowledge tracing
+torch>=2.2
+scikit-learn>=1.4
+
+# Storage (encrypted SQLite)
+# pysqlcipher3 has no Windows wheel; storage.py falls back to sqlite3 + cryptography
+cryptography>=42.0
+
+# Visual grounding (optional — falls back to OpenCV)
+opencv-python-headless>=4.9
+pillow>=10.2
+
+# Demo
+gradio>=4.20
+
+# QR for parent report
+qrcode[pil]>=7.4
+
+# Differential privacy aggregation
+opendp>=0.9 ; platform_system != "Windows"
+
+# Dev
+pytest>=8.0
