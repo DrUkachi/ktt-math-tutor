@@ -51,12 +51,17 @@ def _prompt_audio_path(item: Item, lang: str = "en") -> str | None:
 
 
 def _scene_image_path(item: Item) -> str | None:
-    """Return the rendered-scene PNG for this item, or None.
+    """Return the rendered-scene PNG ONLY for skills where it's needed.
 
-    Counting-skill items are unanswerable without this (the question
-    'How many apples?' only makes sense next to a picture of apples).
-    For other skills the image is decorative but still helpful.
+    - counting: required — 'How many apples?' is unanswerable without
+      the picture.
+    - number_sense: helpful for young learners — '4 or 7?' with a
+      visual of the two numerals.
+    - addition / subtraction / word_problem: text is self-contained;
+      a picture of beads is noise, especially at small mobile sizes.
     """
+    if item.skill not in ("counting", "number_sense"):
+        return None
     if not item.visual:
         return None
     p = ASSETS_DIR / f"{item.visual}.png"
@@ -101,7 +106,6 @@ def ask_next(learner_id: str, age_band: str):
 
 
 def submit_answer(audio_path: str | None, tap_response: str,
-                  typed_response: float | int | None,
                   age_band: str, learner_id: str, pending_item_id: str):
     """Score the currently-displayed item. Then automatically ask the next
     one so the UX flows like a real tutor session."""
@@ -112,9 +116,9 @@ def submit_answer(audio_path: str | None, tap_response: str,
 
     item = tutor.curriculum.get(pending_item_id)
     spoken = _maybe_transcribe(audio_path)
-    typed = ("" if typed_response is None else str(int(typed_response)))
-    # Precedence: spoken > typed (older kids / large numbers) > tapped (young kids).
-    response_text = spoken or typed or tap_response or ""
+    # Precedence: spoken > tapped. If the mic returned a transcript,
+    # use it; otherwise the tap value (or empty string if nothing).
+    response_text = spoken or tap_response or ""
     cycle = tutor.answer(item, response_text)
     lang = cycle.lang_detected if response_text else "kin"
     feedback_text = tutor.feedback(cycle.item, cycle.correct, lang)
@@ -172,19 +176,13 @@ def build_ui() -> gr.Blocks:
         with gr.Group():
             audio_in = gr.Audio(sources=["microphone"], type="filepath",
                                 label="Speak your answer")
-            # Youngest children: 0–20 big tap buttons cover 89% of the
-            # curriculum (71 of 80 items — any single-digit sum, any
-            # counting scene, any compare, most subtraction).
+            # 0–20 tap covers 89 % of the curriculum (71 of 80 items).
+            # The 9 items with answers > 20 are all age band 8–9, and
+            # those older learners can use the mic — no need for a
+            # second input widget cluttering the UI for 6-year-olds.
             tap = gr.Radio(
                 choices=[str(i) for i in range(0, 21)],
                 label="Or tap a number (0–20)", value=None,
-            )
-            # Older children + large answers: a number input. Priority
-            # order in submit_answer is mic > typed > tapped, so the
-            # typed value wins when a tap + type are both set.
-            typed = gr.Number(
-                label="Or type a bigger number",
-                value=None, precision=0, minimum=0, maximum=999,
             )
             submit_btn = gr.Button("Submit", variant="primary", size="lg")
 
@@ -199,7 +197,7 @@ def build_ui() -> gr.Blocks:
         )
         submit_btn.click(
             submit_answer,
-            inputs=[audio_in, tap, typed, age_band, learner, pending],
+            inputs=[audio_in, tap, age_band, learner, pending],
             outputs=[prompt_box, prompt_image, prompt_audio, pending,
                      feedback_box, diag_box],
         )
