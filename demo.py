@@ -32,6 +32,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 CURRICULUM_PATH = REPO_ROOT / "data/T3.1_Math_Tutor/curriculum.json"
 SEED_PATH = REPO_ROOT / "data/T3.1_Math_Tutor/curriculum_seed.json"
 TTS_CACHE = REPO_ROOT / "tts_cache"
+ASSETS_DIR = REPO_ROOT / "assets"
 
 _TUTORS: dict[str, Tutor] = {}
 
@@ -46,6 +47,19 @@ def _load_tutor(learner_id: str) -> Tutor:
 def _prompt_audio_path(item: Item, lang: str = "en") -> str | None:
     # TTS cache is rendered by scripts/render_tts.py using uppercase item IDs.
     p = TTS_CACHE / lang / f"{item.id}.wav"
+    return str(p) if p.exists() else None
+
+
+def _scene_image_path(item: Item) -> str | None:
+    """Return the rendered-scene PNG for this item, or None.
+
+    Counting-skill items are unanswerable without this (the question
+    'How many apples?' only makes sense next to a picture of apples).
+    For other skills the image is decorative but still helpful.
+    """
+    if not item.visual:
+        return None
+    p = ASSETS_DIR / f"{item.visual}.png"
     return str(p) if p.exists() else None
 
 
@@ -72,12 +86,13 @@ def _maybe_transcribe(audio_path: str | None) -> str:
 
 
 def ask_next(learner_id: str, age_band: str):
-    """Pick and display the next item. Returns (prompt_text, tts_path, item_id,
-    cleared-feedback, cleared-diagnostics)."""
+    """Pick and display the next item. Returns (prompt_text, scene_image,
+    tts_path, item_id, cleared-feedback, cleared-diagnostics)."""
     tutor = _load_tutor(learner_id)
     item = tutor.ask(age_band=age_band)
     return (
         item.stem("en"),
+        _scene_image_path(item),          # scene PNG beside the question
         _prompt_audio_path(item, "en"),
         item.id,                          # stashed in gr.State
         "",                               # clear previous feedback
@@ -113,6 +128,7 @@ def submit_answer(audio_path: str | None, tap_response: str,
     )
     return (
         next_item.stem("en"),
+        _scene_image_path(next_item),
         _prompt_audio_path(next_item, "en"),
         next_item.id,
         feedback_text,
@@ -139,12 +155,18 @@ def build_ui() -> gr.Blocks:
             prompt_box = gr.Textbox(
                 label="Question",
                 value="Tap Start to begin.",
-                interactive=False, lines=2,
+                interactive=False, lines=3, max_lines=4,
             )
-            prompt_audio = gr.Audio(
-                label="Listen to the question",
-                interactive=False, autoplay=True,
-            )
+            with gr.Row():
+                prompt_image = gr.Image(
+                    label="Look at the picture",
+                    interactive=False, height=260, show_label=True,
+                    show_download_button=False,
+                )
+                prompt_audio = gr.Audio(
+                    label="Listen to the question",
+                    interactive=False, autoplay=True,
+                )
             start_btn = gr.Button("▶ Start / Next question",
                                   variant="secondary", size="lg")
 
@@ -173,12 +195,14 @@ def build_ui() -> gr.Blocks:
         start_btn.click(
             ask_next,
             inputs=[learner, age_band],
-            outputs=[prompt_box, prompt_audio, pending, feedback_box, diag_box],
+            outputs=[prompt_box, prompt_image, prompt_audio, pending,
+                     feedback_box, diag_box],
         )
         submit_btn.click(
             submit_answer,
             inputs=[audio_in, tap, typed, age_band, learner, pending],
-            outputs=[prompt_box, prompt_audio, pending, feedback_box, diag_box],
+            outputs=[prompt_box, prompt_image, prompt_audio, pending,
+                     feedback_box, diag_box],
         )
     return ui
 
