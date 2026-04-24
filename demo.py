@@ -90,34 +90,42 @@ def _maybe_transcribe(audio_path: str | None) -> str:
         return ""  # Tap fallback always works.
 
 
-def ask_next(learner_id: str, age_band: str):
+def ask_next(learner_id: str, age_band: str, lang: str = "en"):
     """Pick and display the next item. Returns (prompt_text, scene_image,
-    tts_path, item_id, cleared-feedback, cleared-diagnostics)."""
+    tts_path, item_id, cleared-feedback, cleared-diagnostics).
+
+    ``lang`` picks the display language: ``en`` | ``fr`` | ``kin``.
+    Falls back to English automatically if the item lacks a stem in
+    the requested language (see ``Item.stem``).
+    """
     tutor = _load_tutor(learner_id)
     item = tutor.ask(age_band=age_band)
     return (
-        item.stem("en"),
+        item.stem(lang),
         _scene_image_path(item),          # scene PNG beside the question
-        _prompt_audio_path(item, "en"),
+        _prompt_audio_path(item, lang),
         item.id,                          # stashed in gr.State
         "",                               # clear previous feedback
-        f"item={item.id} · skill={item.skill} · answer_hidden",
+        f"item={item.id} · skill={item.skill} · lang={lang} · answer_hidden",
     )
 
 
 def submit_answer(audio_path: str | None, tap_response: str,
                   typed_response: str,
-                  age_band: str, learner_id: str, pending_item_id: str):
+                  age_band: str, learner_id: str, pending_item_id: str,
+                  lang: str = "en"):
     """Score the currently-displayed item. Then automatically ask the next
     one so the UX flows like a real tutor session.
 
     Three-way OR on the inputs: whichever channel the child actually
     used wins. Order (first non-empty wins): spoken > typed > tapped.
+    ``lang`` is the learner's chosen display language — feedback is
+    rendered in it when no response text is detected.
     """
     tutor = _load_tutor(learner_id)
     if not pending_item_id:
         # No active question yet — treat Submit as "please start a session."
-        return ask_next(learner_id, age_band)
+        return ask_next(learner_id, age_band, lang)
 
     item = tutor.curriculum.get(pending_item_id)
     spoken = _maybe_transcribe(audio_path)
@@ -126,20 +134,27 @@ def submit_answer(audio_path: str | None, tap_response: str,
     typed = (typed_response or "").strip()
     response_text = spoken or typed or tap_response or ""
     cycle = tutor.answer(item, response_text)
-    lang = cycle.lang_detected if response_text else "kin"
-    feedback_text = tutor.feedback(cycle.item, cycle.correct, lang)
+    # Feedback-language rule:
+    #   - If the child SPOKE (non-empty ASR transcript), use the
+    #     detected language of that speech — so a Kinyarwanda speaker
+    #     gets 'Yego!' even if the picker said English.
+    #   - Otherwise (typed digits / tapped number / empty) the picker
+    #     wins. Digits have no language anchor, so lang_detected would
+    #     default to 'en' and override the picker incorrectly.
+    feedback_lang = cycle.lang_detected if spoken else lang
+    feedback_text = tutor.feedback(cycle.item, cycle.correct, feedback_lang)
 
-    # Queue up the next question straight away.
+    # Queue up the next question in the same picker-chosen language.
     next_item = tutor.ask(age_band=age_band)
     diagnostics = (
         f"Last: {item.id} ({item.skill}) · "
         f"{'correct' if cycle.correct else 'not quite'} · "
-        f"{cycle.response_ms} ms · lang={lang}"
+        f"{cycle.response_ms} ms · feedback_lang={feedback_lang}"
     )
     return (
-        next_item.stem("en"),
+        next_item.stem(lang),
         _scene_image_path(next_item),
-        _prompt_audio_path(next_item, "en"),
+        _prompt_audio_path(next_item, lang),
         next_item.id,
         feedback_text,
         diagnostics,
@@ -157,6 +172,12 @@ def build_ui() -> gr.Blocks:
             age_band = gr.Radio(
                 choices=["5-6", "6-7", "7-8", "8-9"],
                 value="6-7", label="Age band",
+            )
+            # Value is the internal language code; label is child-friendly.
+            lang_picker = gr.Radio(
+                choices=[("English", "en"), ("Français", "fr"),
+                         ("Kinyarwanda", "kin")],
+                value="kin", label="Language",
             )
 
         pending = gr.State(value="")  # current item's id
@@ -204,13 +225,13 @@ def build_ui() -> gr.Blocks:
 
         start_btn.click(
             ask_next,
-            inputs=[learner, age_band],
+            inputs=[learner, age_band, lang_picker],
             outputs=[prompt_box, prompt_image, prompt_audio, pending,
                      feedback_box, diag_box],
         )
         submit_btn.click(
             submit_answer,
-            inputs=[audio_in, tap, typed, age_band, learner, pending],
+            inputs=[audio_in, tap, typed, age_band, learner, pending, lang_picker],
             outputs=[prompt_box, prompt_image, prompt_audio, pending,
                      feedback_box, diag_box],
         )
