@@ -20,6 +20,10 @@ tts_cache/
 *.db
 *.db-journal
 *.sqlite
+*.key
+
+# Generated parent reports
+reports/
 
 # Build / OS
 .DS_Store
