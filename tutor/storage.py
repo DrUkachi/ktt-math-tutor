@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -51,9 +52,15 @@ class ProgressStore:
     def __init__(self, db_path: str | Path | None = None, key: bytes | None = None):
         self.db_path = Path(db_path or _DEFAULT_DB)
         self._fernet = Fernet(key or self._load_or_create_key())
-        self._conn = sqlite3.connect(self.db_path)
-        self._conn.executescript(self.SCHEMA)
-        self._conn.commit()
+        # ``check_same_thread=False`` lets Gradio's worker threads reuse
+        # the same connection. SQLite serialises writes internally, but
+        # we add an explicit lock to make reads/writes visibly atomic
+        # from Python and to avoid interleaved exception paths.
+        self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        self._lock = threading.Lock()
+        with self._lock:
+            self._conn.executescript(self.SCHEMA)
+            self._conn.commit()
 
     def _load_or_create_key(self) -> bytes:
         key_file = self.db_path.with_suffix(".key")
@@ -75,17 +82,22 @@ class ProgressStore:
             "response_ms": attempt.response_ms,
         }).encode("utf-8")
         token = self._fernet.encrypt(payload)
-        self._conn.execute(
-            "INSERT INTO attempts(learner_id, ts, payload) VALUES (?, ?, ?)",
-            (attempt.learner_id, attempt.ts or time.time(), token),
-        )
-        self._conn.commit()
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO attempts(learner_id, ts, payload) VALUES (?, ?, ?)",
+                (attempt.learner_id, attempt.ts or time.time(), token),
+            )
+            self._conn.commit()
 
     def replay(self, learner_id: str) -> list[Attempt]:
-        rows = self._conn.execute(
-            "SELECT learner_id, ts, payload FROM attempts WHERE learner_id = ? ORDER BY ts",
-            (learner_id,),
-        ).fetchall()
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT learner_id, ts, payload FROM attempts "
+                "WHERE learner_id = ? ORDER BY ts",
+                (learner_id,),
+            ).fetchall()
+        # Decryption happens outside the lock — it's CPU-bound and
+        # touches only per-row bytes, not the shared connection.
         out: list[Attempt] = []
         for lid, ts, token in rows:
             data = json.loads(self._fernet.decrypt(token).decode("utf-8"))
@@ -97,7 +109,8 @@ class ProgressStore:
         return out
 
     def close(self) -> None:
-        self._conn.close()
+        with self._lock:
+            self._conn.close()
 
 
 def aggregate_with_dp(
