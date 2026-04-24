@@ -164,6 +164,12 @@ No numbers, no English text required. Schema in `data/T3.1_Math_Tutor/parent_rep
 
 ---
 
+## Business model & break-even
+
+See [business.md](business.md) for unit economics, the REB per-seat
+licence model ($30/child/year), organisation-level break-even at
+~480 cooperatives / 72k children, and the 17× value-to-cost ratio.
+
 ## Build history
 
 See [PLAN.md](PLAN.md) for the 10-phase plan and
